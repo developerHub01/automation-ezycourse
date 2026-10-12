@@ -58,8 +58,10 @@ export class LoginPage {
     email: string;
     password: string;
   }): Promise<void> {
-    await this.fillForm({ email, password });
-    console.log(this.signInBtn);
+    await this.fillForm({
+      email,
+      password,
+    });
     await this.signInBtn.click();
   }
 

@@ -60,7 +60,9 @@ test.describe("Failed login", () => {
     await expect(loginPage.errorToast).toContainText("Invalid credentials");
     await expect(loginPage.page).toHaveURL(loginPageURL);
   });
+});
 
+test.describe("UI testing", () => {
   test("Field type and required validation", async ({ loginPage }) => {
     await loginPage.goto();
     const loginPageURL = loginPage.page.url();
@@ -77,7 +79,6 @@ test.describe("Failed login", () => {
 
   test("Forgot password redirection", async ({ loginPage }) => {
     await loginPage.goto();
-
     await loginPage.forgotPasswordBtn.click();
 
     await expect(loginPage.page).toHaveURL(URL_REGEX_MAP.forgotPassword);
@@ -85,9 +86,21 @@ test.describe("Failed login", () => {
 
   test("Don't have an account redirection", async ({ loginPage }) => {
     await loginPage.goto();
-
     await loginPage.signUpBtn.click();
 
     await expect(loginPage.page).toHaveURL(URL_REGEX_MAP.signUp);
+  });
+
+  test("Test rate limiting", async ({ loginPage }) => {
+    await loginPage.goto();
+
+    for (let i = 0; i < 10; i++) {
+      await loginPage.login({
+        email: "wrong_email@gmail.com",
+        password: "wrong_password",
+      });
+    }
+
+    expect(loginPage.errorToast).toContainText("Too many requests");
   });
 });
