@@ -17,7 +17,7 @@ export class LoginPage {
     this.form = page.locator(`[aria-describedby="ezy-section"] form`);
     this.email = this.form.locator(`#email`);
     this.password = this.form.locator(`#password`);
-    
+
     this.signInBtn = this.form.getByRole("button", {
       name: "Sign In",
     });
@@ -40,7 +40,7 @@ export class LoginPage {
     await this.page.goto("/login");
   }
 
-  async login({
+  async fillForm({
     email,
     password,
   }: {
@@ -49,6 +49,21 @@ export class LoginPage {
   }): Promise<void> {
     await this.email.fill(email);
     await this.password.fill(password);
+  }
+
+  async login({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<void> {
+    await this.fillForm({ email, password });
+    console.log(this.signInBtn);
     await this.signInBtn.click();
+  }
+
+  async enterInPasswordField(): Promise<void> {
+    await this.password.press("Enter");
   }
 }

@@ -11,7 +11,9 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+dotenv.config({
+  path: path.resolve(__dirname, ".env"),
+});
 
 const SITE_URL = process.env.SITE_URL!;
 
@@ -19,7 +21,7 @@ const SITE_URL = process.env.SITE_URL!;
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./src/tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
