@@ -37,28 +37,28 @@ export class LoginPage {
     );
   }
 
-  async goto(): Promise<void> {
+  goto = async (): Promise<void> => {
     await this.page.goto("/login");
-  }
+  };
 
-  async fillForm({
+  fillForm = async ({
     email,
     password,
   }: {
     email: string;
     password: string;
-  }): Promise<void> {
+  }): Promise<void> => {
     await this.email.fill(email);
     await this.password.fill(password);
-  }
+  };
 
-  async login({
+  login = async ({
     email,
     password,
   }: {
     email: string;
     password: string;
-  }): Promise<void> {
+  }): Promise<void> => {
     await this.fillForm({
       email,
       password,
@@ -70,9 +70,8 @@ export class LoginPage {
     );
     await this.signInBtn.click();
     await responseListener;
-  }
+  };
 
-  async enterInPasswordField(): Promise<void> {
+  enterInPasswordField = async (): Promise<void> =>
     await this.password.press("Enter");
-  }
 }
