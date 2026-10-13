@@ -11,6 +11,7 @@ export class LoginPage {
   readonly emailError: Locator;
   readonly passwordError: Locator;
   readonly errorToast: Locator;
+  readonly loginAPI = "api/student/auth/login";
 
   constructor(page: Page) {
     this.page = page;
@@ -62,7 +63,13 @@ export class LoginPage {
       email,
       password,
     });
+    const responseListener = this.page.waitForResponse(
+      (response) =>
+        response.url().endsWith(`/${this.loginAPI}`) &&
+        response.request().method() === "POST",
+    );
     await this.signInBtn.click();
+    await responseListener;
   }
 
   async enterInPasswordField(): Promise<void> {

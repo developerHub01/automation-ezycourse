@@ -8,8 +8,6 @@ const URL_REGEX_MAP = {
 
 test.describe("Successful login", () => {
   test("Login with valid owner/admin credentials", async ({ loginPage }) => {
-    await loginPage.goto();
-
     await loginPage.login({
       email: process.env.SITE_OWNER_EMAIL!,
       password: process.env.SITE_OWNER_PASSWORD!,
@@ -21,8 +19,6 @@ test.describe("Successful login", () => {
   });
 
   test("Login with valid student credentials", async ({ loginPage }) => {
-    await loginPage.goto();
-
     await loginPage.login({
       email: process.env.BASE_STUDENT_EMAIL!,
       password: process.env.BASE_STUDENT_PASSWORD!,
@@ -33,8 +29,6 @@ test.describe("Successful login", () => {
   });
 
   test("Submit login using Enter", async ({ loginPage }) => {
-    await loginPage.goto();
-
     await loginPage.fillForm({
       email: process.env.BASE_STUDENT_EMAIL!,
       password: process.env.BASE_STUDENT_PASSWORD!,
@@ -49,7 +43,6 @@ test.describe("Successful login", () => {
 
 test.describe("Failed login", () => {
   test("Invalid password shows an error", async ({ loginPage }) => {
-    await loginPage.goto();
     const loginPageURL = loginPage.page.url();
 
     await loginPage.login({
@@ -64,7 +57,6 @@ test.describe("Failed login", () => {
 
 test.describe("UI testing", () => {
   test("Field type and required validation", async ({ loginPage }) => {
-    await loginPage.goto();
     const loginPageURL = loginPage.page.url();
 
     await loginPage.email.fill("example@gmail.com");
@@ -78,29 +70,27 @@ test.describe("UI testing", () => {
   });
 
   test("Forgot password redirection", async ({ loginPage }) => {
-    await loginPage.goto();
     await loginPage.forgotPasswordBtn.click();
 
     await expect(loginPage.page).toHaveURL(URL_REGEX_MAP.forgotPassword);
   });
 
   test("Don't have an account redirection", async ({ loginPage }) => {
-    await loginPage.goto();
     await loginPage.signUpBtn.click();
 
     await expect(loginPage.page).toHaveURL(URL_REGEX_MAP.signUp);
   });
 
   test("Test rate limiting", async ({ loginPage }) => {
-    await loginPage.goto();
-
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       await loginPage.login({
         email: "wrong_email@gmail.com",
         password: "wrong_password",
       });
     }
 
-    expect(loginPage.errorToast).toContainText("Too many requests");
+    await expect(loginPage.errorToast.first()).toContainText(
+      "Too many requests",
+    );
   });
 });
