@@ -24,17 +24,19 @@ test.describe("Add student modal", () => {
       studentPage.heading,
       "Student page heading should be visible",
     ).toBeVisible();
+    await expect(
+      studentPage.addStudentBtn,
+      "Add student button visible",
+    ).toBeVisible();
+    await studentPage.openAddStudentModal();
   });
 
   test.describe("functional", () => {
     test("create new student", async ({ studentPage }) => {
-      await studentPage.openAddStudentModal();
       await studentPage.createStudent();
     });
     test("create new student with existing mail", async ({ studentPage }) => {
       const existingEmail = "shakil102043@gmail.com";
-
-      await studentPage.openAddStudentModal();
 
       const candidateMail = [
         existingEmail,
@@ -61,12 +63,6 @@ test.describe("Add student modal", () => {
 
   test.describe("UI", () => {
     test("add student UI", async ({ studentPage }) => {
-      await expect(
-        studentPage.addStudentBtn,
-        "Add student button visible",
-      ).toBeVisible();
-      await studentPage.openAddStudentModal();
-
       await checkVisibility({
         page: studentPage,
         payload: [
@@ -107,11 +103,6 @@ test.describe("Add student modal", () => {
     });
 
     test("add student error message UI", async ({ studentPage }) => {
-      await expect(
-        studentPage.addStudentBtn,
-        "Add student button visible",
-      ).toBeVisible();
-      await studentPage.openAddStudentModal();
       await studentPage.fillStudentForm({
         firstName: "",
         lastName: "",
@@ -144,17 +135,17 @@ test.describe("Add student modal", () => {
     });
 
     test("add student validation message UI", async ({ studentPage }) => {
-      await expect(
-        studentPage.addStudentBtn,
-        "Add student button visible",
-      ).toBeVisible();
-      await studentPage.openAddStudentModal();
       await studentPage.fillStudentForm({
         firstName: "11",
         lastName: "11",
         email: "@asdfsdf",
         password: "12345",
       });
+
+      console.log(
+        await studentPage.modalStudentPasswordExplainError.textContent(),
+      );
+      // await new Promise(() => setTimeout(() => {}, 1000));
 
       await checkVisibility({
         page: studentPage,
@@ -180,7 +171,7 @@ test.describe("Add student modal", () => {
       await expect(studentPage.modalStudentLastNameExplainError).toHaveText(
         "The input can only contain letters, hyphens, parentheses, and underscores.",
       );
-      await expect(studentPage.modalStudentPassword).toHaveText(
+      await expect(studentPage.modalStudentPasswordExplainError).toHaveText(
         "Password should be at least 6 characters.",
       );
       await studentPage.submitForm();
