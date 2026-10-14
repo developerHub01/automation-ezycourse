@@ -142,11 +142,6 @@ test.describe("Add student modal", () => {
         password: "12345",
       });
 
-      console.log(
-        await studentPage.modalStudentPasswordExplainError.textContent(),
-      );
-      // await new Promise(() => setTimeout(() => {}, 1000));
-
       await checkVisibility({
         page: studentPage,
         payload: [
