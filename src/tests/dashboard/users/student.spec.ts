@@ -31,6 +31,32 @@ test.describe("Add student modal", () => {
       await studentPage.openAddStudentModal();
       await studentPage.createStudent();
     });
+    test("create new student with existing mail", async ({ studentPage }) => {
+      const existingEmail = "shakil102043@gmail.com";
+
+      await studentPage.openAddStudentModal();
+
+      const candidateMail = [
+        existingEmail,
+        existingEmail.toLowerCase(),
+        existingEmail.toUpperCase(),
+      ];
+
+      for (let email of candidateMail) {
+        await studentPage.createStudent({
+          email,
+        });
+
+        await expect(
+          studentPage.modalStudentEmailExplainError,
+          `Email error explainer visible for ${email}`,
+        ).toBeVisible();
+        await expect(
+          studentPage.modalStudentEmailExplainError,
+          `Email already exit error for ${email}`,
+        ).toHaveText("Email is already in use");
+      }
+    });
   });
 
   test.describe("UI", () => {
@@ -115,6 +141,49 @@ test.describe("Add student modal", () => {
           },
         ],
       });
+    });
+
+    test("add student validation message UI", async ({ studentPage }) => {
+      await expect(
+        studentPage.addStudentBtn,
+        "Add student button visible",
+      ).toBeVisible();
+      await studentPage.openAddStudentModal();
+      await studentPage.fillStudentForm({
+        firstName: "11",
+        lastName: "11",
+        email: "@asdfsdf",
+        password: "12345",
+      });
+
+      await checkVisibility({
+        page: studentPage,
+        payload: [
+          {
+            field: "modalStudentFirstNameExplainError",
+            label: "First name explain error",
+          },
+          {
+            field: "modalStudentLastNameExplainError",
+            label: "Last name explain error",
+          },
+          {
+            field: "modalStudentPasswordExplainError",
+            label: "Password explain error",
+          },
+        ],
+      });
+
+      await expect(studentPage.modalStudentFirstNameExplainError).toHaveText(
+        "The input can only contain letters, dots and hyphens.",
+      );
+      await expect(studentPage.modalStudentLastNameExplainError).toHaveText(
+        "The input can only contain letters, hyphens, parentheses, and underscores.",
+      );
+      await expect(studentPage.modalStudentPassword).toHaveText(
+        "Password should be at least 6 characters.",
+      );
+      await studentPage.submitForm();
     });
   });
 });

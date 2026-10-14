@@ -117,7 +117,9 @@ export class AdminDashboardUsersStudentPage {
   closeAddStudentModal = async (): Promise<void> =>
     this.modalStudentClose.click();
 
-  fillStudentForm = async (payload?: IStudentBasic): Promise<IStudentBasic> => {
+  fillStudentForm = async (
+    payload?: Partial<IStudentBasic>,
+  ): Promise<IStudentBasic> => {
     const data = generateStudent(payload);
 
     await this.modalStudentFirstName.fill(data.firstName);
@@ -128,7 +130,9 @@ export class AdminDashboardUsersStudentPage {
     return data;
   };
 
-  createStudent = async (payload?: IStudentBasic): Promise<IStudentBasic> => {
+  createStudent = async (
+    payload?: Partial<IStudentBasic>,
+  ): Promise<IStudentBasic> => {
     const data = await this.fillStudentForm(payload);
 
     /* add student adding listener */
