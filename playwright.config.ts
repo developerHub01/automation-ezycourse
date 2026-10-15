@@ -44,8 +44,30 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: "site_owner_setup",
+      testMatch: "**/auth-setup/site-owner.auth.setup.ts",
+    },
+    {
+      name: "student_setup",
+      testMatch: "**/auth-setup/student.auth.setup.ts",
+    },
+    {
+      name: "site_owner",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "playwright/.auth/site_owner.json",
+      },
+      dependencies: ["site_owner_setup"],
+      testMatch: "**/site-owner-dashboard/**/*.spec.ts",
+    },
+    {
+      name: "student",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "playwright/.auth/student.json",
+      },
+      dependencies: ["student_setup"],
+      testMatch: "**/student-dashboard/**/*.spec.ts",
     },
 
     // {

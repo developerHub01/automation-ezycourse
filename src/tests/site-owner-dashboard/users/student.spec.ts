@@ -1,5 +1,5 @@
 import { expect, test } from "@/fixtures";
-import { AdminDashboardUsersStudentPage } from "@/pages/dashboard/users/student.page";
+import { AdminDashboardUsersStudentPage } from "@/pages/site-owner-dashboard/users/student.page";
 import { Locator } from "@playwright/test";
 
 type TBulkVisiblityPayload = Array<{
@@ -19,23 +19,29 @@ const checkVisibility = async ({
 };
 
 test.describe("Add student modal", () => {
-  test.beforeEach(async ({ studentPage }) => {
+  test.beforeEach(async ({ adminStudentPage }) => {
     await expect(
-      studentPage.heading,
+      adminStudentPage.heading,
       "Student page heading should be visible",
     ).toBeVisible();
     await expect(
-      studentPage.addStudentBtn,
+      adminStudentPage.addStudentBtn,
       "Add student button visible",
     ).toBeVisible();
-    await studentPage.openAddStudentModal();
+    await adminStudentPage.openAddStudentModal();
   });
 
   test.describe("functional", () => {
-    test("create new student", async ({ studentPage }) => {
-      await studentPage.createStudent();
+    test("create new student", async ({ adminStudentPage }) => {
+      await adminStudentPage.createStudent();
+      await expect(
+        adminStudentPage.notificationToast,
+        "Student created successfully",
+      ).toHaveText(adminStudentPage.messageMap["createSuccess"]);
     });
-    test("create new student with existing mail", async ({ studentPage }) => {
+    test("create new student with existing mail", async ({
+      adminStudentPage,
+    }) => {
       const existingEmail = "shakil102043@gmail.com";
 
       const candidateMail = [
@@ -45,16 +51,16 @@ test.describe("Add student modal", () => {
       ];
 
       for (let email of candidateMail) {
-        await studentPage.createStudent({
+        await adminStudentPage.createStudent({
           email,
         });
 
         await expect(
-          studentPage.modalStudentEmailExplainError,
+          adminStudentPage.modalStudentEmailExplainError,
           `Email error explainer visible for ${email}`,
         ).toBeVisible();
         await expect(
-          studentPage.modalStudentEmailExplainError,
+          adminStudentPage.modalStudentEmailExplainError,
           `Email already exit error for ${email}`,
         ).toHaveText("Email is already in use");
       }
@@ -62,9 +68,9 @@ test.describe("Add student modal", () => {
   });
 
   test.describe("UI", () => {
-    test("add student UI", async ({ studentPage }) => {
+    test("add student UI", async ({ adminStudentPage }) => {
       await checkVisibility({
-        page: studentPage,
+        page: adminStudentPage,
         payload: [
           {
             field: "modalTitle",
@@ -102,17 +108,17 @@ test.describe("Add student modal", () => {
       });
     });
 
-    test("add student error message UI", async ({ studentPage }) => {
-      await studentPage.fillStudentForm({
+    test("add student error message UI", async ({ adminStudentPage }) => {
+      await adminStudentPage.fillStudentForm({
         firstName: "",
         lastName: "",
         email: "",
         password: "",
       });
-      await studentPage.submitForm();
+      await adminStudentPage.submitForm();
 
       await checkVisibility({
-        page: studentPage,
+        page: adminStudentPage,
         payload: [
           {
             field: "modalStudentFirstNameExplainError",
@@ -134,8 +140,8 @@ test.describe("Add student modal", () => {
       });
     });
 
-    test("add student validation message UI", async ({ studentPage }) => {
-      await studentPage.fillStudentForm({
+    test("add student validation message UI", async ({ adminStudentPage }) => {
+      await adminStudentPage.fillStudentForm({
         firstName: "11",
         lastName: "11",
         email: "@asdfsdf",
@@ -143,7 +149,7 @@ test.describe("Add student modal", () => {
       });
 
       await checkVisibility({
-        page: studentPage,
+        page: adminStudentPage,
         payload: [
           {
             field: "modalStudentFirstNameExplainError",
@@ -160,16 +166,18 @@ test.describe("Add student modal", () => {
         ],
       });
 
-      await expect(studentPage.modalStudentFirstNameExplainError).toHaveText(
-        "The input can only contain letters, dots and hyphens.",
-      );
-      await expect(studentPage.modalStudentLastNameExplainError).toHaveText(
+      await expect(
+        adminStudentPage.modalStudentFirstNameExplainError,
+      ).toHaveText("The input can only contain letters, dots and hyphens.");
+      await expect(
+        adminStudentPage.modalStudentLastNameExplainError,
+      ).toHaveText(
         "The input can only contain letters, hyphens, parentheses, and underscores.",
       );
-      await expect(studentPage.modalStudentPasswordExplainError).toHaveText(
-        "Password should be at least 6 characters.",
-      );
-      await studentPage.submitForm();
+      await expect(
+        adminStudentPage.modalStudentPasswordExplainError,
+      ).toHaveText("Password should be at least 6 characters.");
+      await adminStudentPage.submitForm();
     });
   });
 });

@@ -2,6 +2,8 @@ import { IStudentBasic } from "@/types/student.types";
 import { generateStudent } from "@/utils/student.utils";
 import { Locator, Page } from "@playwright/test";
 
+type TmessageKey = "createSuccess";
+
 const addStudentAPI = "api/teacher/instactor/createNewUserByAdmin";
 
 export class AdminDashboardUsersStudentPage {
@@ -44,6 +46,12 @@ export class AdminDashboardUsersStudentPage {
 
   readonly modalStudentClose: Locator;
   readonly modalStudentAdd: Locator;
+
+  readonly notificationToast: Locator;
+
+  readonly messageMap: Record<TmessageKey, string> = {
+    createSuccess: "Created",
+  };
 
   constructor(page: Page) {
     this.page = page;
@@ -106,6 +114,11 @@ export class AdminDashboardUsersStudentPage {
     this.modalStudentAdd = this.modalBody.getByRole("button", {
       name: "Add",
     });
+
+    /***
+     *  Notifiation toast =========================
+     */
+    this.notificationToast = this.page.locator(".ant-notification-topRight");
   }
 
   goto = async (): Promise<void> => {
