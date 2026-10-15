@@ -39,6 +39,13 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     headless: false,
+
+    ...devices["Desktop Chrome"],
+    deviceScaleFactor: undefined,
+    viewport: null,
+    launchOptions: {
+      args: ["--start-maximized"],
+    },
   },
 
   /* Configure projects for major browsers */
@@ -54,7 +61,6 @@ export default defineConfig({
     {
       name: "site_owner",
       use: {
-        ...devices["Desktop Chrome"],
         storageState: "playwright/.auth/site_owner.json",
       },
       dependencies: ["site_owner_setup"],
@@ -63,7 +69,6 @@ export default defineConfig({
     {
       name: "student",
       use: {
-        ...devices["Desktop Chrome"],
         storageState: "playwright/.auth/student.json",
       },
       dependencies: ["student_setup"],
