@@ -67,6 +67,10 @@ export default defineConfig({
       testMatch: "**/site-owner-dashboard/**/*.spec.ts",
     },
     {
+      name: "auth",
+      testMatch: "**/auth/**/*.spec.ts",
+    },
+    {
       name: "student",
       use: {
         storageState: "playwright/.auth/student.json",
