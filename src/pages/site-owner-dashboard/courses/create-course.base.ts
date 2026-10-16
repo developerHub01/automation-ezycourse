@@ -1,5 +1,11 @@
 import { Locator, Page } from "@playwright/test";
 
+export interface ICourseBasicInfo {
+  name: string;
+  shortDescription: string;
+  description: string;
+}
+
 export abstract class DashboardCreateCoursesBase {
   abstract readonly url: string;
 
@@ -17,9 +23,9 @@ export abstract class DashboardCreateCoursesBase {
    */
   readonly form: Locator;
   readonly formHeading: Locator;
-  // readonly name: Locator;
-  // readonly shortDescription: Locator;
-  // readonly description: Locator;
+  readonly name: Locator;
+  readonly shortDescription: Locator;
+  readonly description: Locator;
   // readonly category: Locator;
   // readonly image: Locator;
   // readonly video: Locator;
@@ -33,12 +39,6 @@ export abstract class DashboardCreateCoursesBase {
      */
     this.topMenu = this.page.locator("._crtCrse_top").first();
     this.backBtn = this.topMenu.locator("._crtCrse_back").first();
-    // this.backToCoursesBtn = this.topMenu
-    //   .getByRole("link", {
-    //     name: "Back to Courses",
-    //     exact: true,
-    //   })
-    //   .first();
     this.backToCoursesBtn = this.topMenu.locator("._crtCrse_prvw_crse").first();
 
     /***
@@ -52,9 +52,22 @@ export abstract class DashboardCreateCoursesBase {
     this.formHeading = this.form.getByRole("heading", {
       level: 2,
     });
+    this.name = this.form.locator("#title");
+    this.shortDescription = this.form.locator("#short_description");
+    this.description = this.form
+      .locator(`._crtSnglCrse_frm1_itm [contenteditable="true"]`)
+      .first();
   }
 
   goto = async () => await this.page.goto(this.url);
+
+  fill = async (payload: ICourseBasicInfo) => {
+    await this.name.fill(payload.name);
+    await this.shortDescription.fill(payload.shortDescription);
+    await this.description.fill(payload.description);
+  };
+
+  // selectImage = async (imagePath?: string = "/test-assets/img.jpg") => {};
 
   back = async () => {
     await this.backBtn.click();

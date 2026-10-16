@@ -9,6 +9,26 @@ test.describe("All courses", () => {
     });
   });
 
+  // test.describe("Functional", () => {
+  //   test("create single course wrapper", async ({
+  //     dashboardMyCoursesPage: myCoursesPage,
+  //     dashboardCoursesTypePage: courseTypePage,
+  //     dashboardCreateCoursesPage: createCoursePage,
+  //   }) => {
+  //     await myCoursesPage.addCourseButton.click();
+
+  //     await expect(courseTypePage.courseTypePageHeading).toBeVisible();
+  //     await courseTypePage.courseTypePageSingleCourse.click();
+  //     await expect(createCoursePage.formHeading).toBeVisible();
+
+  //     await createCoursePage.fill({
+  //       name: "Dummy name",
+  //       shortDescription: "dummy short description",
+  //       description: "dummy description",
+  //     });
+  //   });
+  // });
+
   test.describe("UI", () => {
     test("All navigation button working", async ({
       dashboardMyCoursesPage: allCoursesPage,
