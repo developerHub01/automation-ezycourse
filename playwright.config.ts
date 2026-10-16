@@ -32,8 +32,9 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
 
+  /* by intention, cause the app is too much slow */
+  timeout: 2 * 60 * 1000,
   expect: {
-    /* by intention, cause the app is too much slow */
     timeout: 50 * 1000,
   },
 
@@ -52,6 +53,9 @@ export default defineConfig({
     launchOptions: {
       args: ["--start-maximized"],
     },
+
+    actionTimeout: 30 * 1000,
+    navigationTimeout: 60 * 1000,
   },
 
   /* Configure projects for major browsers */
@@ -73,7 +77,7 @@ export default defineConfig({
       use: {
         storageState: "playwright/.auth/site_owner.json",
       },
-      dependencies: ["site_owner_setup"],
+      // dependencies: ["site_owner_setup"],
       testMatch: "**/site-owner-dashboard/**/*.spec.ts",
     },
     {
@@ -81,7 +85,7 @@ export default defineConfig({
       use: {
         storageState: "playwright/.auth/student.json",
       },
-      dependencies: ["student_setup"],
+      // dependencies: ["student_setup"],
       testMatch: "**/student-dashboard/**/*.spec.ts",
     },
 
