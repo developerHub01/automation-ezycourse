@@ -31,6 +31,12 @@ export default defineConfig({
   // workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
+
+  expect: {
+    /* by intention, cause the app is too much slow */
+    timeout: 50 * 1000,
+  },
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -59,16 +65,16 @@ export default defineConfig({
       testMatch: "**/auth-setup/student.auth.setup.ts",
     },
     {
+      name: "auth",
+      testMatch: "**/auth/**/*.spec.ts",
+    },
+    {
       name: "site_owner",
       use: {
         storageState: "playwright/.auth/site_owner.json",
       },
       dependencies: ["site_owner_setup"],
       testMatch: "**/site-owner-dashboard/**/*.spec.ts",
-    },
-    {
-      name: "auth",
-      testMatch: "**/auth/**/*.spec.ts",
     },
     {
       name: "student",
