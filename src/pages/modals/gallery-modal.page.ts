@@ -43,14 +43,16 @@ export class GalleryModalPage {
     this.galleryLoadedIndicator = this.galleryRightMain.locator(
       "._modal_upload_gallery_inner .row",
     );
-    this.galleryItems = this.galleryLoadedIndicator.locator(
-      "._mdl_glry_crd _b_radious12",
-    );
+    this.galleryItems = this.galleryLoadedIndicator
+      .locator("._mdl_glry_crd")
+      .filter({
+        hasNot: this.galleryLoadedIndicator.getByText("Click to upload"),
+      });
   }
 
   close = async () => await this.closeBtn.click();
 
-  selectGalleryTab = async (itemText: "Image" | "Stock Images") => {
+  selectGalleryTab = async (itemText: "Image" | "Stock Images" | "Video") => {
     await this.galleryLeftMenuItem
       .filter({
         hasText: itemText,
@@ -61,7 +63,7 @@ export class GalleryModalPage {
     });
   };
 
-  selectNthGalleryItem = async (n: number) => {
+  selectNthGalleryItem = async (n: number = 0) => {
     await this.galleryItems.nth(n).click();
   };
 

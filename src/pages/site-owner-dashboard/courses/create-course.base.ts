@@ -5,8 +5,6 @@ export interface ICourseBasicInfo {
   name: string;
   shortDescription: string;
   description: string;
-  image?: string;
-  video?: string;
 }
 
 export abstract class DashboardCreateCoursesBase {
@@ -88,18 +86,12 @@ export abstract class DashboardCreateCoursesBase {
 
   goto = async () => await this.page.goto(this.url);
 
-  fill = async ({
-    name,
-    shortDescription,
-    description,
-    image,
-    video,
-  }: ICourseBasicInfo) => {
+  fill = async ({ name, shortDescription, description }: ICourseBasicInfo) => {
     await this.name.fill(name);
     await this.shortDescription.fill(shortDescription);
     await this.description.fill(description);
-    await this.setImage(image);
-    await this.setVideo(video);
+    await this.setImage();
+    await this.setVideo();
   };
 
   fillHiddenInput = async ({
@@ -124,21 +116,31 @@ export abstract class DashboardCreateCoursesBase {
     }, value);
   };
 
-  setImage = async (
-    imagePath: string = "https://images.unsplash.com/photo-1792058308865-6f4e27281054",
-  ) =>
-    await this.fillHiddenInput({
-      locator: this.imageInput,
-      value: imagePath,
+  setImage = async () => {
+    await this.imageUploader.click();
+    await this.gallery.modal.waitFor({
+      state: "visible",
     });
+    await this.gallery.selectGalleryTab("Stock Images");
+    await this.gallery.selectNthGalleryItem();
+    await this.gallery.select();
+    await this.gallery.modal.waitFor({
+      state: "detached",
+    });
+  };
 
-  setVideo = async (
-    videoPath: string = "https://www.pexels.com/download/video/1208094/",
-  ) =>
-    await this.fillHiddenInput({
-      locator: this.videoInput,
-      value: videoPath,
+  setVideo = async () => {
+    await this.videoUploader.click();
+    await this.gallery.modal.waitFor({
+      state: "visible",
     });
+    await this.gallery.selectGalleryTab("Video");
+    await this.gallery.selectNthGalleryItem();
+    await this.gallery.select();
+    await this.gallery.modal.waitFor({
+      state: "detached",
+    });
+  };
 
   back = async () => {
     await this.backBtn.click();
