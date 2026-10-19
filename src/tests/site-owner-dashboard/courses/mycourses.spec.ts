@@ -25,6 +25,14 @@ test.describe("All courses", () => {
         name: "Dummy name",
         shortDescription: "dummy short description",
         description: "dummy description",
+        category: ["automation1", "automation2"],
+        access: "private",
+        previewType: "video",
+        isHideEnrollmentCount: false,
+        motivationalPopup: true,
+        publishingStatus: "draft",
+        enableLimitEnrollment: true,
+        enrollmentLimit: 99,
       });
 
       await createCoursePage.createBtn.click();

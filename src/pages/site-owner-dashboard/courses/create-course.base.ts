@@ -1,11 +1,6 @@
 import { GalleryModalPage } from "@/pages/modals/gallery-modal.page";
 import { Locator, Page } from "@playwright/test";
-
-export interface ICourseBasicInfo {
-  name: string;
-  shortDescription: string;
-  description: string;
-}
+import { ISingleCourseBasicInfo } from "./create.page";
 
 export abstract class DashboardCreateCoursesBase {
   abstract readonly url: string;
@@ -29,13 +24,30 @@ export abstract class DashboardCreateCoursesBase {
   readonly name: Locator;
   readonly shortDescription: Locator;
   readonly description: Locator;
-  // readonly category: Locator;
+
+  readonly categoryInput: Locator;
+  readonly categoryListBox: Locator;
+  readonly categoryList: Locator;
+
   readonly assetWrapper: Locator;
   readonly imageUploader: Locator;
   readonly imageInput: Locator;
   readonly videoUploader: Locator;
   readonly videoInput: Locator;
-  // readonly accessibilityStatus: Locator;
+
+  readonly previewType: Locator;
+  readonly previewLocators: Record<
+    NonNullable<ISingleCourseBasicInfo["previewType"]>,
+    Locator
+  >;
+  readonly publishingStatusLocators: Record<
+    NonNullable<ISingleCourseBasicInfo["publishingStatus"]>,
+    Locator
+  >;
+
+  readonly publishStatus: Locator;
+
+  readonly hideEnrollmentCount: Locator;
 
   readonly createBtn: Locator;
 
@@ -68,6 +80,28 @@ export abstract class DashboardCreateCoursesBase {
       .locator(`._crtSnglCrse_frm1_itm [contenteditable="true"]`)
       .first();
 
+    /***
+     *  Category
+     */
+    this.categoryInput = this.form
+      .locator(".crtSnglCrse_frm1_itm")
+      .filter({
+        has: this.page.getByText("Category", {
+          exact: true,
+        }),
+      })
+      .locator(".ant-form-item .ant-select-selector input");
+
+    this.categoryListBox = this.page
+      .locator(".ant-select-dropdown")
+      .filter({
+        has: this.page.locator(`[role="listbox"]#category_ids_list`),
+      })
+      .locator(".rc-virtual-list");
+    this.categoryList = this.categoryListBox.locator(
+      ".rc-virtual-list-holder-inner",
+    );
+
     /**
      *  Assets uploader
      * **/
@@ -82,38 +116,65 @@ export abstract class DashboardCreateCoursesBase {
     this.createBtn = this.form.locator('button[type="submit"]').filter({
       hasText: "Create",
     });
+
+    this.previewType = this.form
+      .locator("._crtSnglCrse_frm1_itm")
+      .filter({
+        has: this.page.getByText("Select course preview type", {
+          exact: true,
+        }),
+      })
+      .locator("#course_preview_type");
+    this.previewLocators = {
+      image: this.previewType.getByLabel("Image"),
+      video: this.previewType.getByLabel("Video"),
+    };
+
+    this.publishStatus = this.form
+      .locator("._crtSnglCrse_frm1_itm")
+      .filter({
+        has: this.page.getByText("Publishing status", {
+          exact: true,
+        }),
+      })
+      .locator("#is_published");
+    this.publishingStatusLocators = {
+      published: this.publishStatus.getByLabel("Published"),
+      draft: this.publishStatus.getByLabel("Draft"),
+    };
+
+    this.hideEnrollmentCount = this.form
+      .locator("._crtSnglCrse_frm1_itm")
+      .filter({
+        has: this.page.getByText("Enrollment count"),
+      })
+      .getByLabel("Hide enrollment count");
   }
 
   goto = async () => await this.page.goto(this.url);
 
-  fill = async ({ name, shortDescription, description }: ICourseBasicInfo) => {
-    await this.name.fill(name);
-    await this.shortDescription.fill(shortDescription);
-    await this.description.fill(description);
-    await this.setImage();
-    await this.setVideo();
-  };
+  selectCategory = async (categories: Array<string>) => {
+    await this.categoryInput.click();
+    await this.categoryListBox.waitFor({
+      state: "attached",
+    });
 
-  fillHiddenInput = async ({
-    locator,
-    value,
-  }: {
-    locator: Locator;
-    value: string;
-  }) => {
-    await locator.evaluate((node: HTMLInputElement, inpValue: string) => {
-      node.value = inpValue;
-      node.dispatchEvent(
-        new Event("input", {
-          bubbles: true,
-        }),
-      );
-      node.dispatchEvent(
-        new Event("change", {
-          bubbles: true,
-        }),
-      );
-    }, value);
+    for (const category of categories) {
+      const selectionCandidate = this.categoryList
+        .getByTitle(category, {
+          exact: true,
+        })
+        .and(this.categoryList.locator('[aria-selected="false"]'));
+
+      try {
+        if (!(await selectionCandidate.count())) throw new Error();
+        await selectionCandidate.click();
+      } catch (error) {
+        console.error(error);
+        continue;
+      }
+    }
+    await this.categoryInput.blur();
   };
 
   setImage = async () => {
