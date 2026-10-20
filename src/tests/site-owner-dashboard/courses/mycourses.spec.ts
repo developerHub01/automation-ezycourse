@@ -38,6 +38,29 @@ test.describe("All courses", () => {
 
       await createCoursePage.createBtn.click();
     });
+
+    test("create bundle course wrapper", async ({
+      dashboardMyCoursesPage: myCoursesPage,
+      dashboardCoursesTypePage: courseTypePage,
+      dashboardCreateBundleCoursesPage: createCoursePage,
+    }) => {
+      await myCoursesPage.addCourseButton.click();
+
+      await expect(courseTypePage.courseTypePageHeading).toBeVisible();
+      await courseTypePage.courseTypePageSingleCourse.click();
+      await expect(createCoursePage.formHeading).toBeVisible();
+
+      await createCoursePage.fill({
+        name: "Dummy bundle name",
+        shortDescription: "dummy short description",
+        description: "dummy description",
+        category: ["automation1", "automation2"],
+        previewType: "video",
+        isHideEnrollmentCount: false,
+      });
+
+      await createCoursePage.createBtn.click();
+    });
   });
 
   test.describe("UI", () => {

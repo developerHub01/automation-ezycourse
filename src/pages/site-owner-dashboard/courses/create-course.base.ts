@@ -183,6 +183,10 @@ export abstract class DashboardCreateCoursesBase {
       .getByLabel("Hide enrollment count");
   }
 
+  protected sanitizeCategory = (
+    category: ISingleCourseBasicInfo["category"],
+  ) => (Array.isArray(category) ? category : category ? [category] : []);
+
   goto = async () => await this.page.goto(this.url);
 
   private selectOption = async ({

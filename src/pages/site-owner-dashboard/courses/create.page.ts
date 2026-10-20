@@ -1,7 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { DashboardCreateCoursesBase } from "@/pages/site-owner-dashboard/courses/create-course.base";
 import {
-  ICourseBasicInfo,
   ISingleCourseBasicInfo,
   TCourseAccessability,
 } from "@/types/courses.types";
@@ -57,8 +56,6 @@ export class DashboardCreateCoursesPage extends DashboardCreateCoursesBase {
     );
   }
 
-  private sanitizeCategory = (category: ISingleCourseBasicInfo["category"]) =>
-    Array.isArray(category) ? category : category ? [category] : [];
 
   fill = async ({
     name,

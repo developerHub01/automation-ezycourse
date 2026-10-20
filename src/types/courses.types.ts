@@ -18,3 +18,8 @@ export interface ISingleCourseBasicInfo extends ICourseBasicInfo {
   enableLimitEnrollment?: boolean;
   enrollmentLimit?: number;
 }
+
+export interface IBundleCourseBasicInfo extends Omit<
+  ICourseBasicInfo,
+  "subCategory"
+> {}
