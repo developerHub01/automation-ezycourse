@@ -185,59 +185,61 @@ export abstract class DashboardCreateCoursesBase {
 
   goto = async () => await this.page.goto(this.url);
 
-  selectCategory = async (categories: Array<string>) => {
-    await this.categoryInput.click();
-    await this.categoryListBox.waitFor({
+  private selectOption = async ({
+    optionInput,
+    optionListBox,
+    optionList,
+    options,
+  }: {
+    optionInput: Locator;
+    optionListBox: Locator;
+    optionList: Locator;
+    options: Array<string>;
+  }): Promise<void> => {
+    if (!options.length) return;
+
+    await optionInput.waitFor({
       state: "attached",
     });
 
-    for (const category of categories) {
-      const selectionCandidate = this.categoryList
-        .getByTitle(category, {
+    await optionInput.click();
+    await optionListBox.waitFor({
+      state: "attached",
+    });
+
+    for (const option of options) {
+      const optionCandidate = optionList
+        .getByTitle(option, {
           exact: true,
         })
-        .and(this.categoryList.locator('[aria-selected="false"]'));
+        .and(optionList.locator('[aria-selected="false"]'));
 
       try {
-        if (!(await selectionCandidate.count())) throw new Error();
-        await selectionCandidate.click();
-      } catch (error) {
-        console.error(error);
-        continue;
-      }
-    }
-    await this.categoryInput.blur();
-  };
-
-  selectSubCategory = async (subs: Array<string>) => {
-    if (!subs.length) return;
-
-    await this.subCategoryInput.waitFor({
-      state: "attached",
-    });
-
-    await this.subCategoryInput.click();
-    await this.subCategoryListBox.waitFor({
-      state: "attached",
-    });
-
-    for (const sub of subs) {
-      const selectionCandidate = this.subCategoryList
-        .getByTitle(sub, {
-          exact: true,
-        })
-        .and(this.subCategoryList.locator('[aria-selected="false"]'));
-
-      try {
-        if (!(await selectionCandidate.count())) throw new Error();
-        await selectionCandidate.click();
+        if (!(await optionCandidate.count())) throw new Error();
+        await optionCandidate.click();
       } catch (error) {
         // console.error(error);
         continue;
       }
     }
-    await this.subCategoryInput.blur();
+    await optionInput.blur();
   };
+
+  selectCategory = async (categories: Array<string>) =>
+    await this.selectOption({
+      optionInput: this.categoryInput,
+      optionListBox: this.categoryListBox,
+      optionList: this.categoryList,
+      options: categories,
+    });
+
+  selectSubCategory = async (subs: Array<string>) =>
+    await this.selectOption({
+      optionInput: this.subCategoryInput,
+      optionListBox: this.subCategoryListBox,
+      optionList: this.subCategoryList,
+      options: subs,
+    });
 
   setImage = async () => {
     await this.imageUploader.click();
