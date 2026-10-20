@@ -1,16 +1,10 @@
 import { Locator, Page } from "@playwright/test";
 import { DashboardCreateCoursesBase } from "@/pages/site-owner-dashboard/courses/create-course.base";
-import { ICourseBasicInfo } from "@/types/courses.types";
-
-export type TCourseAccessability =
-  "public" | "private" | "hidden" | "restricted";
-
-export interface ISingleCourseBasicInfo extends ICourseBasicInfo {
-  access?: TCourseAccessability;
-  motivationalPopup?: boolean;
-  enableLimitEnrollment?: boolean;
-  enrollmentLimit?: number;
-}
+import {
+  ICourseBasicInfo,
+  ISingleCourseBasicInfo,
+  TCourseAccessability,
+} from "@/types/courses.types";
 
 export class DashboardCreateCoursesPage extends DashboardCreateCoursesBase {
   readonly url = "/dashboard/courses/create/";
@@ -63,11 +57,15 @@ export class DashboardCreateCoursesPage extends DashboardCreateCoursesBase {
     );
   }
 
+  private sanitizeCategory = (category: ISingleCourseBasicInfo["category"]) =>
+    Array.isArray(category) ? category : category ? [category] : [];
+
   fill = async ({
     name,
     shortDescription,
     description,
     category,
+    subCategory,
     previewType,
     publishingStatus,
     isHideEnrollmentCount,
@@ -76,16 +74,14 @@ export class DashboardCreateCoursesPage extends DashboardCreateCoursesBase {
     enableLimitEnrollment,
     enrollmentLimit,
   }: ISingleCourseBasicInfo) => {
-    const sanitizedCategory = Array.isArray(category)
-      ? category
-      : category
-        ? [category]
-        : [];
+    const sanitizedCategory = this.sanitizeCategory(category);
+    const sanitizedSubCategory = this.sanitizeCategory(subCategory);
     await this.name.fill(name);
     await this.shortDescription.fill(shortDescription);
     await this.description.fill(description);
 
     if (category) await this.selectCategory(sanitizedCategory);
+    if (subCategory) await this.selectSubCategory(sanitizedSubCategory);
 
     await this.setImage();
     await this.setVideo();

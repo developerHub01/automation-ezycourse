@@ -26,6 +26,7 @@ test.describe("All courses", () => {
         shortDescription: "dummy short description",
         description: "dummy description",
         category: ["automation1", "automation2"],
+        subCategory: ["sub1", "sub-cat1"],
         access: "private",
         previewType: "video",
         isHideEnrollmentCount: false,

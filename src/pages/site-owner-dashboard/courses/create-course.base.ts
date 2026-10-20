@@ -1,6 +1,6 @@
 import { GalleryModalPage } from "@/pages/modals/gallery-modal.page";
+import { ISingleCourseBasicInfo } from "@/types/courses.types";
 import { Locator, Page } from "@playwright/test";
-import { ISingleCourseBasicInfo } from "./create.page";
 
 export abstract class DashboardCreateCoursesBase {
   abstract readonly url: string;
@@ -25,9 +25,19 @@ export abstract class DashboardCreateCoursesBase {
   readonly shortDescription: Locator;
   readonly description: Locator;
 
+  /**
+   * category
+   */
   readonly categoryInput: Locator;
   readonly categoryListBox: Locator;
   readonly categoryList: Locator;
+
+  /**
+   * sub category
+   */
+  readonly subCategoryInput: Locator;
+  readonly subCategoryListBox: Locator;
+  readonly subCategoryList: Locator;
 
   readonly assetWrapper: Locator;
   readonly imageUploader: Locator;
@@ -99,6 +109,28 @@ export abstract class DashboardCreateCoursesBase {
       })
       .locator(".rc-virtual-list");
     this.categoryList = this.categoryListBox.locator(
+      ".rc-virtual-list-holder-inner",
+    );
+
+    /***
+     *  sub category
+     */
+    this.subCategoryInput = this.form
+      .locator(".crtSnglCrse_frm1_itm")
+      .filter({
+        has: this.page.getByText("Sub Category", {
+          exact: true,
+        }),
+      })
+      .locator(".ant-form-item .ant-select-selector input");
+
+    this.subCategoryListBox = this.page
+      .locator(".ant-select-dropdown")
+      .filter({
+        has: this.page.locator(`[role="listbox"]#sub_category_ids_list`),
+      })
+      .locator(".rc-virtual-list");
+    this.subCategoryList = this.subCategoryListBox.locator(
       ".rc-virtual-list-holder-inner",
     );
 
@@ -175,6 +207,36 @@ export abstract class DashboardCreateCoursesBase {
       }
     }
     await this.categoryInput.blur();
+  };
+
+  selectSubCategory = async (subs: Array<string>) => {
+    if (!subs.length) return;
+
+    await this.subCategoryInput.waitFor({
+      state: "attached",
+    });
+
+    await this.subCategoryInput.click();
+    await this.subCategoryListBox.waitFor({
+      state: "attached",
+    });
+
+    for (const sub of subs) {
+      const selectionCandidate = this.subCategoryList
+        .getByTitle(sub, {
+          exact: true,
+        })
+        .and(this.subCategoryList.locator('[aria-selected="false"]'));
+
+      try {
+        if (!(await selectionCandidate.count())) throw new Error();
+        await selectionCandidate.click();
+      } catch (error) {
+        // console.error(error);
+        continue;
+      }
+    }
+    await this.subCategoryInput.blur();
   };
 
   setImage = async () => {
