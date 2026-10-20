@@ -17,8 +17,8 @@ test.describe("All courses", () => {
     }) => {
       await myCoursesPage.addCourseButton.click();
 
-      await expect(courseTypePage.courseTypePageHeading).toBeVisible();
-      await courseTypePage.courseTypePageSingleCourse.click();
+      await expect(courseTypePage.mainHeading).toBeVisible();
+      await courseTypePage.typeSingleCourse.click();
       await expect(createCoursePage.formHeading).toBeVisible();
 
       await createCoursePage.fill({
@@ -46,8 +46,8 @@ test.describe("All courses", () => {
     }) => {
       await myCoursesPage.addCourseButton.click();
 
-      await expect(courseTypePage.courseTypePageHeading).toBeVisible();
-      await courseTypePage.courseTypePageSingleCourse.click();
+      await expect(courseTypePage.mainHeading).toBeVisible();
+      await courseTypePage.typeBundleCourse.click();
       await expect(createCoursePage.formHeading).toBeVisible();
 
       await createCoursePage.fill({
@@ -73,16 +73,16 @@ test.describe("All courses", () => {
       /* add course button */
       await allCoursesPage.addCourseButton.click();
       await expect(
-        courseTypePage.courseTypePageHeading,
+        courseTypePage.mainHeading,
         "Add course button working",
       ).toBeVisible();
 
       /* course type page back button */
       await expect(
-        courseTypePage.courseTypePageBackBtn,
+        courseTypePage.backBtn,
         "course type page back button visible",
       ).toBeVisible();
-      await courseTypePage.courseTypePageBackBtn.click();
+      await courseTypePage.backBtn.click();
       await expect(
         allCoursesPage.allCoursesHeading,
         "Course type back button working",
@@ -98,12 +98,12 @@ test.describe("All courses", () => {
       }> = [
         {
           type: "single",
-          selector: courseTypePage.courseTypePageSingleCourse,
+          selector: courseTypePage.typeSingleCourse,
           heading: "Create single course",
         },
         {
           type: "bundle",
-          selector: courseTypePage.courseTypePageBundleCourse,
+          selector: courseTypePage.typeBundleCourse,
           heading: "Create bundle course",
         },
       ];
@@ -111,7 +111,7 @@ test.describe("All courses", () => {
       for (let { type, selector, heading } of courseTypeNavigationMap) {
         await allCoursesPage.addCourseButton.click();
 
-        await expect(courseTypePage.courseTypePageHeading).toBeVisible();
+        await expect(courseTypePage.mainHeading).toBeVisible();
 
         /* select type button */
         await selector.click();
@@ -123,7 +123,7 @@ test.describe("All courses", () => {
         /* create page back button */
         await courseCreatePage.backBtn.click();
         await expect(
-          courseTypePage.courseTypePageHeading,
+          courseTypePage.typeBundleCourse,
           `${type} back button working`,
         ).toBeVisible();
 

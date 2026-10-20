@@ -8,11 +8,10 @@ export class DashboardCoursesTypePage {
   /***
    * Course type selector page
    */
-  readonly courseTypePage: Locator;
-  readonly courseTypePageHeading: Locator;
-  readonly courseTypePageSingleCourse: Locator;
-  readonly courseTypePageBundleCourse: Locator;
-  readonly courseTypePageBackBtn: Locator;
+  readonly mainHeading: Locator;
+  readonly typeSingleCourse: Locator;
+  readonly typeBundleCourse: Locator;
+  readonly backBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -20,29 +19,17 @@ export class DashboardCoursesTypePage {
     /***
      * Course type selector page
      */
-    this.courseTypePage = this.page.locator("._courseType_page").first();
-    // this.courseTypePageBackBtn = this.courseTypePage.getByRole("link", {
-    //   name: "Back",
-    //   exact: true,
-    // });
-    this.courseTypePageBackBtn = this.page.locator("._courseType_page_back");
-    this.courseTypePageHeading = this.courseTypePage.getByRole("heading", {
+    this.backBtn = this.page.locator("._courseType_page_back");
+    this.mainHeading = this.page.getByRole("heading", {
       name: "Select Course Type",
     });
-    this.courseTypePageSingleCourse = this.courseTypePage.getByRole("heading", {
+    this.typeSingleCourse = this.page.getByRole("heading", {
       name: "Single course",
     });
-    this.courseTypePageBundleCourse = this.courseTypePage.getByRole("heading", {
+    this.typeBundleCourse = this.page.getByRole("heading", {
       name: "Bundle course",
     });
   }
 
-  goto = async () => await this.page.goto("/dashboard/mycourses/");
-
-  // backFromCourseType = async () => {
-  //   await this.courseTypePageBackBtn.click();
-  //   await this.allCoursesHeading.waitFor({
-  //     state: "visible",
-  //   });
-  // };
+  goto = async () => await this.page.goto(this.url);
 }
