@@ -56,7 +56,6 @@ export class DashboardCreateCoursesPage extends DashboardCreateCoursesBase {
     );
   }
 
-
   fill = async ({
     name,
     shortDescription,
