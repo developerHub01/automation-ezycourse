@@ -1,4 +1,6 @@
 import { DropdownComponent } from "@/components/dropdown-menu.component";
+import { DeleteCourseModal } from "@/modals/delete-course.modal";
+import { NotificationBase } from "@/notifications/notification.base";
 import { Locator, Page } from "@playwright/test";
 
 export class DashboardMyCoursesPage {
@@ -23,9 +25,23 @@ export class DashboardMyCoursesPage {
   readonly tableBody: Locator;
   readonly tableRow: Locator;
 
+  /**
+   * Footer
+   */
   readonly tableFooter: Locator;
+  readonly tablePagination: Locator;
+  readonly pageTotal: Locator;
+  readonly pagePrev: Locator;
+  readonly pageNext: Locator;
+  readonly pageOptions: Locator;
+  readonly pageOptionSelector: Locator;
+  readonly pageOptionInput: Locator;
+  readonly pageOptionsListbox: Locator;
+  readonly pageOptionsListItem: Locator;
 
   readonly dropdownComponent: DropdownComponent;
+  readonly deleteCourseModal: DeleteCourseModal;
+  readonly notificationBase: NotificationBase;
 
   constructor(page: Page) {
     this.page = page;
@@ -67,12 +83,29 @@ export class DashboardMyCoursesPage {
     /***
      *  Table footer
      */
-    this.tableFooter = this.tableMain.locator(".ant-table-footer");
+    this.tableFooter = this.tableWrapper.locator(".ant-table-footer");
+    this.tablePagination = this.tableFooter.locator(".ant-pagination");
+    this.pageTotal = this.tablePagination.locator(".ant-pagination-total-text");
+    this.pagePrev = this.tablePagination.locator(".ant-pagination-prev");
+    this.pageNext = this.tablePagination.locator(".ant-pagination-next");
+    this.pageOptions = this.tablePagination.locator(".ant-pagination-options");
+    this.pageOptionSelector = this.pageOptions.locator(".ant-select-selector");
+    this.pageOptionInput = this.pageOptionSelector.getByRole("combobox", {
+      name: "Page Size",
+    });
+    this.pageOptionsListbox = this.pageOptions.locator(
+      ".ant-select-dropdown .rc-virtual-list-holder-inner",
+    );
+    this.pageOptionsListItem = this.pageOptionsListbox.locator(
+      ".ant-select-item-option",
+    );
 
     /**
      *  dropdown menu
      */
     this.dropdownComponent = new DropdownComponent(this.page);
+    this.deleteCourseModal = new DeleteCourseModal(this.page);
+    this.notificationBase = new NotificationBase(this.page);
   }
 
   goto = async () => await this.page.goto(this.url);
@@ -112,18 +145,55 @@ export class DashboardMyCoursesPage {
       })
       .locator(".ant-dropdown-trigger");
 
-  delete = async (id: number) => {
+  delete = async (id: number): Promise<Boolean> => {
     const row = await this.getRowById(id);
 
-    if (!row || !(await row.count())) return;
+    if (!row || !(await row.count())) return false;
     const actionBtn = this.getActionBtn(row);
-
-    console.log({
-      actionBtnCnt: await actionBtn.count(),
-      actionBtnInnerHTML: await actionBtn.innerHTML(),
-    });
 
     await actionBtn.click();
     await this.dropdownComponent.selectAction("Delete");
+    await this.deleteCourseModal.delete();
+
+    const status = await this.notificationBase.checkStatus();
+    await this.page.waitForTimeout(3000);
+    return status === "success";
+  };
+
+  deleteMultiple = async (ids: Array<number>) => {
+    for (const id of ids) {
+      await this.delete(id);
+    }
+  };
+
+  searchAllOverAndDelete = async (ids: Array<string>) => {
+    const searchEachPage = async () => {};
+  };
+
+  /*  5 | 10 | 15 | 20 | 30 | 50 */
+  changePageSize = async (size: number) => {
+    const paginationText = `${size} / page`;
+
+    const ariaExpanded =
+      await this.pageOptionInput.getAttribute("aria-expanded");
+
+    if (ariaExpanded !== "true") await this.pageOptionSelector.click();
+
+    await this.pageOptionsListbox.waitFor({
+      state: "visible",
+    });
+
+    await this.pageOptionsListItem
+      .filter({
+        has: this.page.getByText(paginationText, {
+          exact: true,
+        }),
+      })
+      .and(this.page.locator(`[aria-selected="false"]`))
+      .click();
+
+    await this.pageOptionSelector.getByText(paginationText).waitFor({
+      state: "visible",
+    });
   };
 }

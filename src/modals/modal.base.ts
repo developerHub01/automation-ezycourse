@@ -8,12 +8,15 @@ export class ModalBase {
   readonly header: Locator;
   readonly title: Locator;
   readonly body: Locator;
+  readonly footer: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.modal = this.page
-      .locator(".ant-modal-root .ant-modal-content")
+      .locator(".ant-modal-root")
+      .getByRole("dialog")
+      .locator(".ant-modal-content")
       .first();
 
     this.closeX = this.modal
@@ -26,8 +29,9 @@ export class ModalBase {
 
     this.header = this.modal.locator(".ant-modal-header");
     this.title = this.header.locator(".ant-modal-title");
-    
+
     this.body = this.modal.locator(".ant-modal-body");
+    this.footer = this.modal.locator(".ant-modal-footer");
   }
 
   close = async () => await this.closeX.click();

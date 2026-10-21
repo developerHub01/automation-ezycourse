@@ -1,3 +1,4 @@
+import { DashboardMyCoursesPage } from "./../../../pages/site-owner-dashboard/courses/mycourses.page";
 import { expect, test } from "@/fixtures";
 import { Locator } from "@playwright/test";
 
@@ -65,7 +66,8 @@ test.describe("All courses", () => {
     test("Delete course by id", async ({
       dashboardMyCoursesPage: myCoursesPage,
     }) => {
-      await myCoursesPage.delete(49919);
+      // await myCoursesPage.delete(49917);
+      await myCoursesPage.deleteMultiple([49952, 49951, 49914]);
     });
   });
 
@@ -149,6 +151,28 @@ test.describe("All courses", () => {
       }
 
       expect("All navigation buttons working");
+    });
+
+    test("Check pagination page size", async ({
+      dashboardMyCoursesPage: myCoursePage,
+    }) => {
+      await myCoursePage.pageOptionSelector.click();
+
+      const pageSizes = (
+        await myCoursePage.pageOptionsListItem.allInnerTexts()
+      ).map((item) => Number(item.split("/")[0].trim()));
+
+      for (const [index, size] of pageSizes.entries()) {
+        await myCoursePage.changePageSize(size);
+
+        if (index === pageSizes.length - 1) {
+          const rowCount = await myCoursePage.tableRow.count();
+          expect(rowCount).toBeGreaterThan(0);
+          expect(rowCount).toBeLessThanOrEqual(size);
+          continue;
+        }
+        expect(myCoursePage.tableRow).toHaveCount(size);
+      }
     });
   });
 });
