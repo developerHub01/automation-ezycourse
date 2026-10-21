@@ -149,9 +149,7 @@ export class DashboardMyCoursesPage {
   changePageSize = async (size: number) => {
     const paginationText = `${size} / page`;
 
-    const ariaExpanded =
-      await this.pageOptionInput.getAttribute("aria-expanded");
-
+    let ariaExpanded = await this.pageOptionInput.getAttribute("aria-expanded");
     if (ariaExpanded !== "true") await this.pageOptionSelector.click();
 
     await this.pageOptionsListbox.waitFor({
@@ -164,15 +162,18 @@ export class DashboardMyCoursesPage {
           exact: true,
         }),
       })
-      .and(this.page.locator(`[aria-selected="false"]`))
+      // .and(this.page.locator(`[aria-selected="false"]`))
       .click();
 
     await this.pageOptionSelector.getByText(paginationText).waitFor({
       state: "visible",
     });
+
+    // ariaExpanded = await this.pageOptionInput.getAttribute("aria-expanded");
+    // if (ariaExpanded === "true") await this.pageOptionSelector.click();
   };
 
-  delete = async (id: number): Promise<Boolean> => {
+  delete = async (id: number): Promise<boolean> => {
     const row = await this.getRowById(id);
 
     if (!row || !(await row.count())) return false;
@@ -186,35 +187,47 @@ export class DashboardMyCoursesPage {
     return status === "success";
   };
 
-  deleteMultiple = async (ids: Array<number>) => {
-    const deleted: Array<number> = [];
-    for (const id of ids) {
-      const isDeleted = await this.delete(id);
-      if (isDeleted) deleted.push(id);
-    }
-    return deleted;
-  };
-
-  searchAllOverAndDelete = async ({
+  searchAllOverAndDoAction = async ({
     ids,
     pageSize = 50,
+    callback,
   }: {
     ids: Array<number>;
     pageSize?: 5 | 10 | 15 | 20 | 30 | 50;
+    callback: (id: number) => Promise<boolean>;
   }) => {
-    const remainToDelete = new Set([...ids]);
+    const remainIds = new Set([...ids]);
+    if (!remainIds.size) return;
 
     await this.changePageSize(pageSize);
 
     const searchEachPage = async () => {
-      if (!remainToDelete.size || (await this.pageNext.isDisabled())) return;
+      if (!remainIds.size || (await this.pageNext.isDisabled())) return;
 
-      const deletedIds = await this.deleteMultiple([...remainToDelete]);
-      deletedIds.forEach((id) => remainToDelete.delete(id));
+      const completedId: Array<number> = [];
+      for (const id of [...remainIds]) {
+        const isDeleted = await callback(id);
+        if (isDeleted) completedId.push(id);
+      }
+
+      completedId.forEach((id) => remainIds.delete(id));
       await this.pageNext.click();
       await searchEachPage();
     };
 
     await searchEachPage();
   };
+
+  searchAllOverAndDelete = async ({
+    ids,
+    pageSize = 10,
+  }: {
+    ids: Array<number>;
+    pageSize?: 5 | 10 | 15 | 20 | 30 | 50;
+  }) =>
+    await this.searchAllOverAndDoAction({
+      ids,
+      pageSize,
+      callback: async (id) => await this.delete(id),
+    });
 }

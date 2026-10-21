@@ -67,8 +67,34 @@ test.describe("All courses", () => {
     }) => {
       await myCoursesPage.searchAllOverAndDelete({
         ids: [48036],
-        pageSize: 5,
+        pageSize: 50,
       });
+    });
+
+    test("Delete all courses by ids", async ({
+      dashboardMyCoursesPage: myCoursesPage,
+    }) => {
+      const recursive = async () => {
+        const colIndex = await myCoursesPage.getColIndexByName("id");
+        const allRows = await myCoursesPage.tableRow.all();
+
+        const rowColCount = await allRows[0].getByRole("cell").count();
+        if (rowColCount <= 1) return;
+
+        const ids = await Promise.all(
+          allRows.map(async (row) =>
+            Number(await row.getByRole("cell").nth(colIndex).innerText()),
+          ),
+        );
+
+        await myCoursesPage.searchAllOverAndDelete({
+          ids,
+        });
+
+        await recursive();
+      };
+
+      await recursive();
     });
   });
 
