@@ -61,6 +61,12 @@ test.describe("All courses", () => {
 
       await createCoursePage.createBtn.click();
     });
+
+    test("Delete course by id", async ({
+      dashboardMyCoursesPage: myCoursesPage,
+    }) => {
+      await myCoursesPage.delete(49919);
+    });
   });
 
   test.describe("UI", () => {
