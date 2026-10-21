@@ -1,4 +1,3 @@
-import { DashboardMyCoursesPage } from "./../../../pages/site-owner-dashboard/courses/mycourses.page";
 import { expect, test } from "@/fixtures";
 import { Locator } from "@playwright/test";
 
@@ -63,11 +62,13 @@ test.describe("All courses", () => {
       await createCoursePage.createBtn.click();
     });
 
-    test("Delete course by id", async ({
+    test("Delete course by ids", async ({
       dashboardMyCoursesPage: myCoursesPage,
     }) => {
-      // await myCoursesPage.delete(49917);
-      await myCoursesPage.deleteMultiple([49952, 49951, 49914]);
+      await myCoursesPage.searchAllOverAndDelete({
+        ids: [48036],
+        pageSize: 5,
+      });
     });
   });
 

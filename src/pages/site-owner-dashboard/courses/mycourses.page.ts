@@ -145,31 +145,6 @@ export class DashboardMyCoursesPage {
       })
       .locator(".ant-dropdown-trigger");
 
-  delete = async (id: number): Promise<Boolean> => {
-    const row = await this.getRowById(id);
-
-    if (!row || !(await row.count())) return false;
-    const actionBtn = this.getActionBtn(row);
-
-    await actionBtn.click();
-    await this.dropdownComponent.selectAction("Delete");
-    await this.deleteCourseModal.delete();
-
-    const status = await this.notificationBase.checkStatus();
-    await this.page.waitForTimeout(3000);
-    return status === "success";
-  };
-
-  deleteMultiple = async (ids: Array<number>) => {
-    for (const id of ids) {
-      await this.delete(id);
-    }
-  };
-
-  searchAllOverAndDelete = async (ids: Array<string>) => {
-    const searchEachPage = async () => {};
-  };
-
   /*  5 | 10 | 15 | 20 | 30 | 50 */
   changePageSize = async (size: number) => {
     const paginationText = `${size} / page`;
@@ -195,5 +170,51 @@ export class DashboardMyCoursesPage {
     await this.pageOptionSelector.getByText(paginationText).waitFor({
       state: "visible",
     });
+  };
+
+  delete = async (id: number): Promise<Boolean> => {
+    const row = await this.getRowById(id);
+
+    if (!row || !(await row.count())) return false;
+    const actionBtn = this.getActionBtn(row);
+
+    await actionBtn.click();
+    await this.dropdownComponent.selectAction("Delete");
+    await this.deleteCourseModal.delete();
+
+    const status = await this.notificationBase.checkStatus();
+    return status === "success";
+  };
+
+  deleteMultiple = async (ids: Array<number>) => {
+    const deleted: Array<number> = [];
+    for (const id of ids) {
+      const isDeleted = await this.delete(id);
+      if (isDeleted) deleted.push(id);
+    }
+    return deleted;
+  };
+
+  searchAllOverAndDelete = async ({
+    ids,
+    pageSize = 50,
+  }: {
+    ids: Array<number>;
+    pageSize?: 5 | 10 | 15 | 20 | 30 | 50;
+  }) => {
+    const remainToDelete = new Set([...ids]);
+
+    await this.changePageSize(pageSize);
+
+    const searchEachPage = async () => {
+      if (!remainToDelete.size || (await this.pageNext.isDisabled())) return;
+
+      const deletedIds = await this.deleteMultiple([...remainToDelete]);
+      deletedIds.forEach((id) => remainToDelete.delete(id));
+      await this.pageNext.click();
+      await searchEachPage();
+    };
+
+    await searchEachPage();
   };
 }
