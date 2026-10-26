@@ -71,7 +71,24 @@ test.describe("All courses", () => {
       });
     });
 
-    test("Delete all courses by ids", async ({
+    test("Delete course by name and id", async ({
+      dashboardMyCoursesPage: myCoursesPage,
+    }) => {
+      const deletionMeta = {
+        name: "Dummy name",
+        id: 50185,
+      };
+
+      await myCoursesPage.tableSearchInput.fill(deletionMeta.name);
+      await expect(myCoursesPage.tableSearchReset).toBeVisible();
+
+      await myCoursesPage.searchAllOverAndDelete({
+        ids: [deletionMeta.id],
+        pageSize: 50,
+      });
+    });
+
+    test("Delete all courses", async ({
       dashboardMyCoursesPage: myCoursesPage,
     }) => {
       const recursive = async () => {

@@ -15,6 +15,13 @@ export class DashboardMyCoursesPage {
   readonly addCourseButton: Locator;
 
   /**
+   * Filter area
+   */
+  readonly tableFilterArea: Locator;
+  readonly tableSearchInput: Locator;
+  readonly tableSearchReset: Locator;
+
+  /**
    *  Table wrapper
    */
   readonly tableWrapper: Locator;
@@ -57,6 +64,21 @@ export class DashboardMyCoursesPage {
     this.addCourseButton = this.page.getByRole("button", {
       name: "Add Course",
       exact: true,
+    });
+
+    /**
+     * ======================
+     * Table filter
+     * ======================
+     */
+    this.tableFilterArea = this.page
+      .locator("._table_top_itm_all")
+      .first();
+    this.tableSearchInput = this.tableFilterArea.locator(
+      "._top_srch_box1 input",
+    );
+    this.tableSearchReset = this.tableFilterArea.getByRole("button", {
+      name: "Reset filters",
     });
 
     /***
