@@ -6,9 +6,9 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
   readonly url = (id: number) =>
     `dashboard/courses/${id}/setting/advance-info/`;
 
-  readonly language = this.page.locator("input#course_language");
-  readonly videoDuration = this.page.locator("input#video_duration");
-  readonly paymentMethodWrapper = this.page
+  readonly language = this.main.locator("input#course_language");
+  readonly videoDuration = this.main.locator("input#video_duration");
+  readonly paymentMethodWrapper = this.main
     .locator("._crtSnglCrse_frm1")
     .filter({
       has: this.page.getByText("Select payment methods"),
@@ -27,8 +27,47 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
   readonly paymentMethodListItem =
     this.paymentMethodList.locator(".ant-select-item");
 
-  readonly enableCourseLevel = this.page.locator("#enable_course_level");
-  readonly courseLevelInput = this.page.locator("#course_level input");
+  readonly enableCourseLevel = this.main.locator("#enable_course_level");
+  readonly courseLevelInput = this.main.locator("#course_level input");
+
+  readonly addCourseAssuranceCheck = this.main.locator(
+    "#enable_money_back_guarantee",
+  );
+  readonly courseAssuranceInput = this.main.locator("input#guarantee_text");
+
+  readonly courseIncludesSection = this.main
+    .locator("._crtSnglCrse_frm1_itm")
+    .filter({
+      hasText: "Course Includes",
+    });
+  readonly showQuizzesNumberCountCheck =
+    this.courseIncludesSection.locator("#hide_quizzes");
+  readonly showAssignmentsNumberCountCheck =
+    this.courseIncludesSection.locator("#hide_assignments");
+  readonly enableCourseIncludesCheck = this.courseIncludesSection.locator(
+    "#enable_course_includes",
+  );
+  readonly courseIncludesDeleteBtns = this.courseIncludesSection
+    .getByRole("button")
+    .filter({
+      has: this.page.getByRole("img", {
+        name: "delete",
+      }),
+    });
+  readonly courseIncludesPluseBtns = this.courseIncludesSection
+    .getByRole("button")
+    .filter({
+      has: this.page.getByRole("img", {
+        name: "plus",
+      }),
+    });
+
+  readonly customIncludesInputs = this.courseIncludesSection.locator(
+    'input[id^="course_includes_list_"]',
+  );
+
+  readonly enableCourseReviewCheck = this.main.locator("#enable_course_review");
+  readonly enableGiftingCheck = this.main.locator("#enable_gift");
 
   constructor(page: Page) {
     super(page);
@@ -110,5 +149,89 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
     await this.courseLevelInput
       .and(this.page.locator(`[value="${level?.toUpperCase()}"]`))
       .check();
+  };
+
+  addCourseAssurance = async (assurance: ICourseAdvanceInfo["assurance"]) => {
+    if (assurance === undefined) return;
+
+    if (!assurance.check) return await this.addCourseAssuranceCheck.uncheck();
+
+    await this.addCourseAssuranceCheck.check();
+    await this.courseAssuranceInput.first().waitFor({
+      state: "visible",
+    });
+    await this.courseAssuranceInput.fill(assurance.value);
+  };
+
+  checkShowQuizzesNumberCount = async (
+    check: ICourseAdvanceInfo["includes"]["showQuizzesNumberCount"],
+  ) => {
+    if (check === undefined) return;
+    return check
+      ? this.showAssignmentsNumberCountCheck.check()
+      : this.showAssignmentsNumberCountCheck.uncheck();
+  };
+
+  checkShowAssignmentsNumberCount = async (
+    check: ICourseAdvanceInfo["includes"]["showAssignmentsNumberCount"],
+  ) => {
+    if (check === undefined) return;
+    return check
+      ? this.showAssignmentsNumberCountCheck.check()
+      : this.showAssignmentsNumberCountCheck.uncheck();
+  };
+
+  clearCustomCourseIncludes = async () => {
+    while (await this.courseIncludesDeleteBtns.count()) {
+      await this.courseIncludesDeleteBtns.first().click();
+    }
+  };
+
+  checkEnableCourseIncludes = async (
+    payload: ICourseAdvanceInfo["includes"]["addCustomCourseIncludes"],
+  ) => {
+    if (payload === undefined) return;
+
+    payload.check
+      ? await this.enableCourseIncludesCheck.check()
+      : await this.enableCourseIncludesCheck.uncheck();
+
+    if (!payload.check) return;
+    await this.clearCustomCourseIncludes();
+  };
+
+  addCourseIncludesFields = async (
+    payload: ICourseAdvanceInfo["includes"]["addCustomCourseIncludes"],
+  ) => {
+    if (!payload?.check) return;
+
+    for (const [index, field] of payload.fields.entries()) {
+      await this.customIncludesInputs.last().fill(field);
+      if (index === payload.fields.length - 1) continue;
+      await this.courseIncludesPluseBtns.last().click();
+    }
+  };
+
+  addCourseIncludes = async (
+    payload: ICourseAdvanceInfo["includes"]["addCustomCourseIncludes"],
+  ) => {
+    await this.checkEnableCourseIncludes(payload);
+    await this.addCourseIncludesFields(payload);
+  };
+
+  checkEnableCourseReview = async (
+    check: ICourseAdvanceInfo["enableCourseReview"],
+  ) => {
+    if (check === undefined) return;
+    return check
+      ? this.enableCourseReviewCheck.check()
+      : this.enableCourseReviewCheck.uncheck();
+  };
+
+  checkEnableGifting = async (check: ICourseAdvanceInfo["enableGifting"]) => {
+    if (check === undefined) return;
+    return check
+      ? this.enableGiftingCheck.check()
+      : this.enableGiftingCheck.uncheck();
   };
 }

@@ -45,8 +45,8 @@ const sidebarItemList: Array<{
 
 test.describe("Course create", () => {
   test.beforeEach(async ({ dashboardCoursesSettingsBase }) => {
-    // await dashboardCoursesSettingsBase.goto(50434);
-    await dashboardCoursesSettingsBase.goto(50492);
+    await dashboardCoursesSettingsBase.goto(50452);
+    // await dashboardCoursesSettingsBase.goto(50492);
     await dashboardCoursesSettingsBase.mainHeading.waitFor({
       state: "visible",
     });
@@ -57,12 +57,20 @@ test.describe("Course create", () => {
       dashboardCoursesAdvanceInfoPage: advanceinfoPage,
     }) => {
       await advanceinfoPage.gotoTab(sidebarItemList[1]);
-      await advanceinfoPage.selectMethods([
-        "fastspring",
-        "manual",
-        "mercadopago",
-      ]);
-      await advanceinfoPage.selectLevel("advanced");
+      // await advanceinfoPage.selectMethods([
+      //   "fastspring",
+      //   "manual",
+      //   "mercadopago",
+      // ]);
+      // await advanceinfoPage.selectLevel("advanced");
+      // await advanceinfoPage.addCourseAssurance({
+      //   check: true,
+      //   value: "hello world",
+      // });
+      await advanceinfoPage.addCourseIncludes({
+        check: true,
+        fields: ["x", "y", "z"],
+      });
       await advanceinfoPage.saveBtn.click();
       await advanceinfoPage.page.waitForTimeout(1000);
     });

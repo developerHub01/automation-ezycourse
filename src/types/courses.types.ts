@@ -32,11 +32,26 @@ export interface ICourseAdvanceInfo {
   duration: number;
   paymentMethods: Array<TCoursePaymentMethod> | "all";
   level?: "beginner" | "intermediate" | "advanced";
-  assurance?: string;
+  assurance?:
+    | {
+        check: true;
+        value: string;
+      }
+    | {
+        check: false;
+        value?: never;
+      };
   includes: {
     showQuizzesNumberCount: boolean;
     showAssignmentsNumberCount: boolean;
-    addCustomCourseIncludes?: Array<string>;
+    addCustomCourseIncludes?:
+      | {
+          check: true;
+          fields: Array<string>;
+        }
+      | {
+          check: false;
+        };
   };
   learningOutcomes?: Array<string>;
   faq?: Array<{
