@@ -71,6 +71,27 @@ test.describe("Course create", () => {
         check: true,
         fields: ["x", "y", "z"],
       });
+      await advanceinfoPage.addLearningOutcome({
+        check: true,
+        fields: ["x", "y", "z"],
+      });
+      await advanceinfoPage.addFaq({
+        check: true,
+        fields: [
+          {
+            question: "question1",
+            answer: "answer1",
+          },
+          {
+            question: "question2",
+            answer: "answer2",
+          },
+          {
+            question: "question3",
+            answer: "answer3",
+          },
+        ],
+      });
       await advanceinfoPage.saveBtn.click();
       await advanceinfoPage.page.waitForTimeout(1000);
     });

@@ -53,11 +53,25 @@ export interface ICourseAdvanceInfo {
           check: false;
         };
   };
-  learningOutcomes?: Array<string>;
-  faq?: Array<{
-    question: string;
-    answer: string;
-  }>;
+  learningOutcomes?:
+    | {
+        check: true;
+        fields: Array<string>;
+      }
+    | {
+        check: false;
+      };
+  faq?:
+    | {
+        check: true;
+        fields: Array<{
+          question: string;
+          answer: string;
+        }>;
+      }
+    | {
+        check: false;
+      };
   enableCourseReview: boolean;
   enableGifting: boolean;
 }

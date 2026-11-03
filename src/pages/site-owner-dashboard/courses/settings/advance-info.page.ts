@@ -44,6 +44,7 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
     this.courseIncludesSection.locator("#hide_quizzes");
   readonly showAssignmentsNumberCountCheck =
     this.courseIncludesSection.locator("#hide_assignments");
+
   readonly enableCourseIncludesCheck = this.courseIncludesSection.locator(
     "#enable_course_includes",
   );
@@ -61,10 +62,52 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
         name: "plus",
       }),
     });
-
   readonly customIncludesInputs = this.courseIncludesSection.locator(
     'input[id^="course_includes_list_"]',
   );
+
+  readonly learningOutcomeSection = this.main
+    .locator("._crtSnglCrse_frm1_itm")
+    .filter({
+      hasText: "Add learning outcomes",
+    });
+  readonly learningOutcomeCheck = this.learningOutcomeSection.locator(
+    "#enable_learning_module",
+  );
+  readonly learningOutcomeDeleteBtns = this.learningOutcomeSection
+    .getByRole("button")
+    .filter({
+      has: this.page.getByRole("img", {
+        name: "delete",
+      }),
+    });
+  readonly learningOutcomePluseBtns = this.learningOutcomeSection
+    .getByRole("button")
+    .filter({
+      has: this.page.getByRole("img", {
+        name: "plus",
+      }),
+    });
+  readonly learningOutcomeInputs = this.learningOutcomeSection.locator(
+    'input[id^="course_learning_list_"]',
+  );
+
+  readonly faqSection = this.main.locator("._crtSnglCrse_frm1_itm").filter({
+    hasText: "Add FAQ",
+  });
+  readonly faqCheck = this.faqSection.locator("#enable_faq");
+  readonly faqDeleteBtns = this.faqSection.getByRole("button").filter({
+    has: this.page.getByRole("img", {
+      name: "delete",
+    }),
+  });
+  readonly faqPluseBtns = this.faqSection.getByRole("button").filter({
+    has: this.page.getByRole("img", {
+      name: "plus",
+    }),
+  });
+  readonly faqQuestionInputs = this.faqSection.getByPlaceholder("Question");
+  readonly faqAnsInputs = this.faqSection.getByPlaceholder("Answer");
 
   readonly enableCourseReviewCheck = this.main.locator("#enable_course_review");
   readonly enableGiftingCheck = this.main.locator("#enable_gift");
@@ -217,6 +260,75 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
   ) => {
     await this.checkEnableCourseIncludes(payload);
     await this.addCourseIncludesFields(payload);
+  };
+
+  checkEnableLearningOutcome = async (
+    payload: ICourseAdvanceInfo["learningOutcomes"],
+  ) => {
+    if (payload === undefined) return;
+
+    payload.check
+      ? await this.learningOutcomeCheck.check()
+      : await this.learningOutcomeCheck.uncheck();
+
+    if (!payload.check) return;
+    await this.clearCustomCourseIncludes();
+  };
+
+  clearLearningOutcome = async () => {
+    while (await this.learningOutcomeDeleteBtns.count()) {
+      await this.learningOutcomeDeleteBtns.first().click();
+    }
+  };
+
+  addLearningOutcomeFields = async (
+    payload: ICourseAdvanceInfo["learningOutcomes"],
+  ) => {
+    if (!payload?.check) return;
+
+    for (const [index, field] of payload.fields.entries()) {
+      await this.learningOutcomeInputs.last().fill(field);
+      if (index === payload.fields.length - 1) continue;
+      await this.learningOutcomePluseBtns.last().click();
+    }
+  };
+
+  addLearningOutcome = async (
+    payload: ICourseAdvanceInfo["learningOutcomes"],
+  ) => {
+    await this.checkEnableLearningOutcome(payload);
+    await this.addLearningOutcomeFields(payload);
+  };
+
+  clearFaq = async () => {
+    while (await this.faqDeleteBtns.count()) {
+      await this.faqDeleteBtns.first().click();
+    }
+  };
+
+  checkFaq = async (payload: ICourseAdvanceInfo["faq"]) => {
+    if (payload === undefined) return;
+
+    payload.check ? await this.faqCheck.check() : await this.faqCheck.uncheck();
+
+    if (!payload.check) return;
+    await this.clearFaq();
+  };
+
+  addFaqFields = async (payload: ICourseAdvanceInfo["faq"]) => {
+    if (!payload?.check) return;
+
+    for (const [index, field] of payload.fields.entries()) {
+      await this.faqQuestionInputs.last().fill(field.question);
+      await this.faqAnsInputs.last().fill(field.answer);
+      if (index === payload.fields.length - 1) continue;
+      await this.faqPluseBtns.last().click();
+    }
+  };
+
+  addFaq = async (payload: ICourseAdvanceInfo["faq"]) => {
+    await this.checkFaq(payload);
+    await this.addFaqFields(payload);
   };
 
   checkEnableCourseReview = async (
