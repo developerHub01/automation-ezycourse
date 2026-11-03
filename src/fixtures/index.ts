@@ -7,6 +7,8 @@ import { DashboardMyCoursesPage } from "@/pages/site-owner-dashboard/courses/myc
 import { DashboardCoursesTypePage } from "@/pages/site-owner-dashboard/courses/course-type.page";
 import { DashboardCreateCoursesPage } from "@/pages/site-owner-dashboard/courses/create.page";
 import { DashboardCreateBundleCoursesPage } from "@/pages/site-owner-dashboard/courses/bundle-create.page";
+import { DashboardCoursesSettingsBase } from "@/pages/site-owner-dashboard/courses/settings/settings.base";
+import { DashboardCoursesAdvanceInfoPage } from "@/pages/site-owner-dashboard/courses/settings/advance-info.page";
 
 export const test = base.extend<{
   loginPage: LoginPage;
@@ -17,6 +19,9 @@ export const test = base.extend<{
   dashboardCoursesTypePage: DashboardCoursesTypePage;
   dashboardCreateCoursesPage: DashboardCreateCoursesPage;
   dashboardCreateBundleCoursesPage: DashboardCreateBundleCoursesPage;
+
+  dashboardCoursesSettingsBase: DashboardCoursesSettingsBase;
+  dashboardCoursesAdvanceInfoPage: DashboardCoursesAdvanceInfoPage;
 }>({
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
@@ -42,6 +47,11 @@ export const test = base.extend<{
     await use(new DashboardCreateCoursesPage(page)),
   dashboardCreateBundleCoursesPage: async ({ page }, use) =>
     await use(new DashboardCreateBundleCoursesPage(page)),
+
+  dashboardCoursesSettingsBase: async ({ page }, use) =>
+    await use(new DashboardCoursesSettingsBase(page)),
+  dashboardCoursesAdvanceInfoPage: async ({ page }, use) =>
+    await use(new DashboardCoursesAdvanceInfoPage(page)),
 });
 
 export { expect } from "@playwright/test";

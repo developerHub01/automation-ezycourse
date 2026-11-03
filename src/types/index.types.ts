@@ -6,3 +6,16 @@ export type AuthRole =
   | "student"
   | "seller"
   | "custom_role";
+
+export type TPaymentMethods =
+  | "stripe"
+  | "fastspring"
+  | "razopay"
+  | "mercadopago"
+  | "paystack"
+  | "sslcommerz"
+  | "xendit"
+  | "flutterwave"
+  | "shurjopay"
+  | "paddle"
+  | "iyzico";

@@ -23,3 +23,26 @@ export interface IBundleCourseBasicInfo extends Omit<
   ICourseBasicInfo,
   "subCategory"
 > {}
+
+export type TCoursePaymentMethod =
+  "stripe" | "fastspring" | "razopay" | "manual" | "mercadopago";
+
+export interface ICourseAdvanceInfo {
+  language: string;
+  duration: number;
+  paymentMethods: Array<TCoursePaymentMethod> | "all";
+  level?: "beginner" | "intermediate" | "advanced";
+  assurance?: string;
+  includes: {
+    showQuizzesNumberCount: boolean;
+    showAssignmentsNumberCount: boolean;
+    addCustomCourseIncludes?: Array<string>;
+  };
+  learningOutcomes?: Array<string>;
+  faq?: Array<{
+    question: string;
+    answer: string;
+  }>;
+  enableCourseReview: boolean;
+  enableGifting: boolean;
+}
