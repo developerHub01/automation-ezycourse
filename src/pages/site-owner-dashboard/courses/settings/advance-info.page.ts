@@ -44,15 +44,7 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
         .count(),
     );
 
-  fill = async (data: Partial<ICourseAdvanceInfo>) => {
-    const { language, duration, paymentMethods, level } = data;
-
-    if (language !== undefined) await this.language.fill(language);
-    if (duration !== undefined)
-      await this.videoDuration.fill(duration.toString());
-    if (paymentMethods !== undefined) await this.selectMethods(paymentMethods);
-    if ("level" in data) await this.selectLevel(level);
-  };
+  fill = async ({}: Partial<ICourseAdvanceInfo>) => {};
 
   clearAllPaymentMethods = async () => {
     while (await this.paymentSelectedItem.count()) {
@@ -71,19 +63,39 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
       state: "visible",
     });
 
-    const methodNames = Array.isArray(methods)
-      ? methods
-      : await this.paymentMethodListItem.allInnerTexts();
-
-    for (const method of methodNames) {
-      const methodLocator = this.paymentMethodListItem.getByText(method);
-      if (
-        (await this.isPaymentSelected(method)) ||
-        !(await methodLocator.count())
-      )
-        continue;
-
+    if (!Array.isArray(methods)) {
+      const methodLocator = this.paymentMethodListItem.getByText(methods);
       await methodLocator.click();
+    } else {
+      const allExistingMethods =
+        await this.paymentMethodListItem.allInnerTexts();
+
+      /**
+       * {a, b, c, d}
+       * {X, Y, Z, c, a}
+       * ================
+       * {X, Y, Z, c, a} - {a, b, c, d}
+       * {X, Y, Z}
+       * ================
+       * {X, Y, Z, c, a} - {X, Y, Z}
+       * {c, a}
+       */
+      const listedMethods = Array.from(
+        new Set(methods).difference(
+          new Set(methods).difference(new Set(allExistingMethods)),
+        ),
+      );
+
+      for (const method of listedMethods) {
+        const methodLocator = this.paymentMethodListItem.getByText(method);
+        if (
+          (await this.isPaymentSelected(method)) ||
+          !(await methodLocator.count())
+        )
+          continue;
+
+        await methodLocator.click();
+      }
     }
 
     await this.paymentMethodSelectorInput.blur();
