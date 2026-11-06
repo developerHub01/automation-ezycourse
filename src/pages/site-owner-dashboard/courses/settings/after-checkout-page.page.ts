@@ -138,7 +138,6 @@ export class DashboardCoursesAfterCheckoutPage extends DashboardCoursesSettingsB
     await this.saveBtn.click();
 
     const status = await this.notificationBase.checkStatus();
-
     return status === "success";
   };
 

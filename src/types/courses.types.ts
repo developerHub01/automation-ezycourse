@@ -86,3 +86,16 @@ export interface ICourseAfterCheckoutPage {
   type: "internal" | "external";
   nameOrURL: string;
 }
+
+export type ICourseCertificationSettings =
+  | {
+      enable: false;
+    }
+  | {
+      enable: true;
+      certificate: string;
+      switchs: {
+        allowWithoutCompletion: boolean;
+        displayCompletionTime: boolean;
+      };
+    };

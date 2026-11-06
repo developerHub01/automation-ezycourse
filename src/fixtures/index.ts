@@ -11,6 +11,7 @@ import { DashboardCoursesSettingsBase } from "@/pages/site-owner-dashboard/cours
 import { DashboardCoursesAdvanceInfoPage } from "@/pages/site-owner-dashboard/courses/settings/advance-info.page";
 import { DashboardCoursesLandingPagePage } from "@/pages/site-owner-dashboard/courses/settings/landing-page.page";
 import { DashboardCoursesAfterCheckoutPage } from "@/pages/site-owner-dashboard/courses/settings/after-checkout-page.page";
+import { DashboardCertificateSettingsPage } from "@/pages/site-owner-dashboard/courses/settings/certificate-settings.page";
 
 export const test = base.extend<{
   loginPage: LoginPage;
@@ -26,6 +27,7 @@ export const test = base.extend<{
   dashboardCoursesAdvanceInfoPage: DashboardCoursesAdvanceInfoPage;
   dashboardCoursesLandingPagePage: DashboardCoursesLandingPagePage;
   dashboardCoursesAfterCheckoutPage: DashboardCoursesAfterCheckoutPage;
+  dashboardCertificateSettingsPage: DashboardCertificateSettingsPage;
 }>({
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
@@ -60,6 +62,8 @@ export const test = base.extend<{
     await use(new DashboardCoursesLandingPagePage(page)),
   dashboardCoursesAfterCheckoutPage: async ({ page }, use) =>
     await use(new DashboardCoursesAfterCheckoutPage(page)),
+  dashboardCertificateSettingsPage: async ({ page }, use) =>
+    await use(new DashboardCertificateSettingsPage(page)),
 });
 
 export { expect } from "@playwright/test";

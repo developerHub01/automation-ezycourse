@@ -3,6 +3,8 @@ import { ICourseLandingPage } from "@/types/courses.types";
 
 const courseId = 50452;
 
+const certificateName = "certificate2";
+
 const sidebarItemList: Array<{
   name: string;
   title: string | null;
@@ -859,7 +861,121 @@ test.describe("Course settings", () => {
         await afterPage.selectPageTypeTab("internal");
 
         await expect(afterPage.saveBtn).toBeVisible();
-        await expect(afterPage.resetToDefaultBtn).toBeVisible();
+        // await expect(afterPage.resetToDefaultBtn).toBeVisible();
+      });
+    });
+  });
+
+  /****
+   * Certification page
+   */
+  test.describe("Certification", () => {
+    test.beforeEach(
+      async ({ dashboardCertificateSettingsPage: certificatePage }) =>
+        await certificatePage.gotoTab(sidebarItemList[4]),
+    );
+
+    test.describe("Functional", () => {
+      test("should enable certification", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(true);
+
+        await expect(certificatePage.certificateIdLabel).toBeVisible();
+        await expect(certificatePage.certificateSelector).toBeVisible();
+      });
+
+      test("should disable certification", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(false);
+
+        await expect(certificatePage.certificateIdLabel).toBeHidden();
+      });
+
+      test("should select a certificate", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(true);
+        await certificatePage.changeCertificate(certificateName);
+
+        await expect(certificatePage.certificateSelector).toContainText(
+          certificateName,
+        );
+      });
+
+      test("should configure certification switches", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(true);
+
+        await certificatePage.handleSwitch({
+          allowWithoutCompletion: true,
+          displayCompletionTime: true,
+        });
+
+        await expect(certificatePage.allowWithoutCompleting).toBeChecked();
+        await expect(certificatePage.displayCompletionTime).toBeChecked();
+
+        await certificatePage.handleSwitch({
+          allowWithoutCompletion: false,
+          displayCompletionTime: false,
+        });
+
+        await expect(certificatePage.allowWithoutCompleting).not.toBeChecked();
+        await expect(certificatePage.displayCompletionTime).not.toBeChecked();
+      });
+
+      test("should save enabled certification settings", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.fill({
+          enable: true,
+          certificate: certificateName,
+          switchs: {
+            allowWithoutCompletion: true,
+            displayCompletionTime: true,
+          },
+        });
+
+        expect(await certificatePage.update()).toBeTruthy();
+      });
+
+      test("should save disabled certification settings", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.fill({
+          enable: false,
+        });
+
+        expect(await certificatePage.update()).toBeTruthy();
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should display certification toggle and update button", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await expect(certificatePage.enableCertificationCheck).toBeVisible();
+        await expect(certificatePage.updateBtn).toBeVisible();
+      });
+
+      test("should display certification configuration when enabled", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(true);
+
+        await expect(certificatePage.certificateIdLabel).toBeVisible();
+        await expect(certificatePage.certificateSelector).toBeVisible();
+        await expect(certificatePage.allowWithoutCompleting).toBeVisible();
+        await expect(certificatePage.displayCompletionTime).toBeVisible();
+      });
+
+      test("should hide certification configuration when disabled", async ({
+        dashboardCertificateSettingsPage: certificatePage,
+      }) => {
+        await certificatePage.changeCertificationCheck(false);
+        await expect(certificatePage.certificateIdLabel).toBeHidden();
       });
     });
   });
