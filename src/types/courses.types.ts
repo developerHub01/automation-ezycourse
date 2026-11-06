@@ -99,3 +99,5 @@ export type ICourseCertificationSettings =
         displayCompletionTime: boolean;
       };
     };
+
+export type TCourseRedirectToCheckoutPageSetting = string | null;

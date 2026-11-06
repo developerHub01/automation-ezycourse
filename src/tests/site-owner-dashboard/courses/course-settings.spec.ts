@@ -4,6 +4,7 @@ import { ICourseLandingPage } from "@/types/courses.types";
 const courseId = 50452;
 
 const certificateName = "certificate2";
+const redirectToCheckoutPage = "Marketplace";
 
 const sidebarItemList: Array<{
   name: string;
@@ -976,6 +977,62 @@ test.describe("Course settings", () => {
       }) => {
         await certificatePage.changeCertificationCheck(false);
         await expect(certificatePage.certificateIdLabel).toBeHidden();
+      });
+    });
+  });
+
+  /****
+   *  Redirect to checkout page
+   */
+  test.describe("Redirect to checkout page", () => {
+    test.beforeEach(
+      async ({ dashboardCoursesRedirectToCheckoutPage: redirectPage }) => {
+        await redirectPage.gotoTab(sidebarItemList[8]);
+        await expect(redirectPage.mainHeading).toHaveText(
+          "Redirect to checkout page setting",
+        );
+      },
+    );
+
+    /****
+     *  Functional
+     */
+    test.describe("Functional", () => {
+      /****
+       *  Choose a custom checkout page
+       */
+      test("should choose a custom checkout page", async ({
+        dashboardCoursesRedirectToCheckoutPage: redirectPage,
+      }) => {
+        await redirectPage.chooseCustomPage(redirectToCheckoutPage);
+
+        await expect(redirectPage.changePageBtn).toBeVisible();
+        await expect(redirectPage.resetToDefaultBtn).toBeVisible();
+      });
+
+      /****
+       *  Change the selected checkout page
+       */
+      test("should change the selected checkout page", async ({
+        dashboardCoursesRedirectToCheckoutPage: redirectPage,
+      }) => {
+        await redirectPage.changePage(redirectToCheckoutPage);
+
+        await expect(redirectPage.changePageBtn).toBeVisible();
+        await expect(redirectPage.resetToDefaultBtn).toBeVisible();
+      });
+
+      /****
+       *  Reset checkout page configuration
+       */
+      test("should reset checkout page configuration to default", async ({
+        dashboardCoursesRedirectToCheckoutPage: redirectPage,
+      }) => {
+        await redirectPage.resetPageToDefault();
+
+        await expect(redirectPage.chooseCustomPageBtn).toBeVisible();
+        await expect(redirectPage.changePageBtn).toBeHidden();
+        await expect(redirectPage.resetToDefaultBtn).toBeHidden();
       });
     });
   });
