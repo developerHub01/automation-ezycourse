@@ -75,3 +75,9 @@ export interface ICourseAdvanceInfo {
   enableCourseReview: boolean;
   enableGifting: boolean;
 }
+
+export interface ICourseLandingPage {
+  preview: number;
+  hideEnrollmentCount: boolean;
+  customLandingPage: null | string;
+}

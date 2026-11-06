@@ -9,6 +9,7 @@ import { DashboardCreateCoursesPage } from "@/pages/site-owner-dashboard/courses
 import { DashboardCreateBundleCoursesPage } from "@/pages/site-owner-dashboard/courses/bundle-create.page";
 import { DashboardCoursesSettingsBase } from "@/pages/site-owner-dashboard/courses/settings/settings.base";
 import { DashboardCoursesAdvanceInfoPage } from "@/pages/site-owner-dashboard/courses/settings/advance-info.page";
+import { DashboardCoursesLandingPagePage } from "@/pages/site-owner-dashboard/courses/settings/landing-page.page";
 
 export const test = base.extend<{
   loginPage: LoginPage;
@@ -22,6 +23,7 @@ export const test = base.extend<{
 
   dashboardCoursesSettingsBase: DashboardCoursesSettingsBase;
   dashboardCoursesAdvanceInfoPage: DashboardCoursesAdvanceInfoPage;
+  dashboardCoursesLandingPagePage: DashboardCoursesLandingPagePage;
 }>({
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
@@ -52,6 +54,8 @@ export const test = base.extend<{
     await use(new DashboardCoursesSettingsBase(page)),
   dashboardCoursesAdvanceInfoPage: async ({ page }, use) =>
     await use(new DashboardCoursesAdvanceInfoPage(page)),
+  dashboardCoursesLandingPagePage: async ({ page }, use) =>
+    await use(new DashboardCoursesLandingPagePage(page)),
 });
 
 export { expect } from "@playwright/test";

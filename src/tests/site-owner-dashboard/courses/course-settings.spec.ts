@@ -1,4 +1,5 @@
 import { expect, test } from "@/fixtures";
+import { ICourseLandingPage } from "@/types/courses.types";
 
 const courseId = 50452;
 
@@ -598,6 +599,138 @@ test.describe("Course settings", () => {
 
         await expect(advanceinfoPage.faqQuestionInputs.first()).toBeVisible();
         await expect(advanceinfoPage.faqAnsInputs.first()).toBeVisible();
+      });
+    });
+  });
+
+  test.describe("Landing Page", () => {
+    test.beforeEach(
+      async ({ dashboardCoursesLandingPagePage: landingPage }) => {
+        await landingPage.gotoTab(sidebarItemList[2]);
+      },
+    );
+
+    /****
+     * Functional
+     */
+    test.describe("Functional", () => {
+      test("Update course details landing page", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        const payload: Partial<ICourseLandingPage> = {
+          preview: 1,
+        };
+
+        await landingPage.fill(payload);
+
+        await expect(
+          landingPage.landingPageCheck.nth(payload.preview!),
+        ).toBeChecked();
+      });
+
+      test("Update enrollment count visibility", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        await landingPage.fill({
+          hideEnrollmentCount: true,
+        });
+        await expect(landingPage.enrollmentCountHiddenCheck).toBeChecked();
+      });
+
+      test("Update custom landing page", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        await landingPage.fill({
+          customLandingPage: "Creator",
+        });
+
+        await expect(landingPage.customLandingPageResetButton).toBeVisible();
+      });
+
+      test("Reset custom landing page to default", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        const payload: Partial<ICourseLandingPage> = {
+          customLandingPage: null,
+        };
+
+        await landingPage.fill(payload);
+
+        await expect(landingPage.customLandingPageChooseButton).toBeVisible();
+      });
+
+      test("Update all landing page settings together", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        const payload: Partial<ICourseLandingPage> = {
+          preview: 0,
+          hideEnrollmentCount: true,
+          customLandingPage: null,
+        };
+
+        await landingPage.fill(payload);
+
+        await expect(
+          landingPage.landingPageCheck.nth(payload.preview!),
+        ).toBeChecked();
+
+        await expect(landingPage.enrollmentCountHiddenCheck).toBeChecked();
+
+        await expect(landingPage.customLandingPageResetButton).toBeVisible();
+      });
+    });
+
+    /****
+     * UI
+     */
+    test.describe("UI", () => {
+      test("Verify course details landing page options", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        await expect(landingPage.detailsPageForm).toBeVisible();
+
+        await expect(landingPage.landingPageLabels.first()).toBeVisible();
+
+        await expect(landingPage.landingPageCheck.first()).toBeVisible();
+
+        await expect(landingPage.landingPagePreview.first()).toBeVisible();
+
+        await expect(landingPage.detailsPageFormUpdateBtn).toBeVisible();
+      });
+
+      test("Verify landing page preview dialog", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        await landingPage.previewLandigPage();
+
+        await expect(landingPage.landingPagePreviewDialogue).toBeVisible();
+
+        await expect(landingPage.landingPagePreviewDialogueImg).toBeVisible();
+
+        await expect(landingPage.landingPagePreviewDialogueClose).toBeVisible();
+
+        await landingPage.closePreviewPage();
+      });
+
+      test("Verify enrollment count settings controls", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        await expect(landingPage.enrollmentCountForm).toBeVisible();
+
+        await expect(landingPage.enrollmentCountHiddenCheck).toBeVisible();
+
+        await expect(landingPage.enrollmentCountFormUpdateBtn).toBeVisible();
+      });
+
+      test("Verify custom landing page controls", async ({
+        dashboardCoursesLandingPagePage: landingPage,
+      }) => {
+        if (await landingPage.customLandingPageChooseButton.isVisible()) {
+          await expect(landingPage.customLandingPageChooseButton).toBeVisible();
+        } else {
+          await expect(landingPage.customLandingPageChangeButton).toBeVisible();
+          await expect(landingPage.customLandingPageResetButton).toBeVisible();
+        }
       });
     });
   });
