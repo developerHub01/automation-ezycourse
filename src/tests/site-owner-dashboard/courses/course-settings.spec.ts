@@ -603,6 +603,9 @@ test.describe("Course settings", () => {
     });
   });
 
+  /****
+   * Landing page settings
+   */
   test.describe("Landing Page", () => {
     test.beforeEach(
       async ({ dashboardCoursesLandingPagePage: landingPage }) => {
@@ -731,6 +734,132 @@ test.describe("Course settings", () => {
           await expect(landingPage.customLandingPageChangeButton).toBeVisible();
           await expect(landingPage.customLandingPageResetButton).toBeVisible();
         }
+      });
+    });
+  });
+
+  /****
+   * After checkout page
+   */
+  test.describe("After checkout page", () => {
+    test.beforeEach(
+      async ({
+        dashboardCoursesLandingPagePage: landingPage,
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await landingPage.gotoTab(sidebarItemList[3]);
+
+        await afterPage.afterCheckoutPageLinkLoc.waitFor({
+          state: "attached",
+        });
+      },
+    );
+
+    test.describe("Functional", () => {
+      test("should switch between internal and external page types", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await afterPage.selectPageTypeTab("internal");
+
+        await expect(afterPage.pageSelector).toBeVisible();
+
+        await afterPage.selectPageTypeTab("external");
+
+        await expect(afterPage.urlInput).toBeVisible();
+      });
+
+      test("should select and save an internal after-checkout page", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        const pageIndexInList = 2;
+        await afterPage.selectPageTypeTab("internal");
+
+        await afterPage.pageSelector.click();
+
+        await afterPage.pageListBox.waitFor({
+          state: "visible",
+        });
+
+        const pageName = await afterPage.pageListItem
+          .nth(pageIndexInList)
+          .innerText();
+
+        await afterPage.selectPage(pageName);
+
+        expect(await afterPage.save()).toBeTruthy();
+
+        await afterPage.page.reload();
+
+        await afterPage.selectPageTypeTab("internal");
+
+        await expect(afterPage.pageSelector).toContainText(pageName);
+      });
+
+      test("should save an external after-checkout URL", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        const externalURL = "https://example.com/thank-you";
+
+        await afterPage.fill({
+          type: "external",
+          nameOrURL: externalURL,
+        });
+
+        expect(await afterPage.save()).toBeTruthy();
+
+        await afterPage.page.reload();
+
+        await afterPage.selectPageTypeTab("external");
+
+        await expect(afterPage.urlInput).toHaveValue(externalURL);
+      });
+
+      test("should reset the after-checkout page configuration to default", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await afterPage.fill({
+          type: "external",
+          nameOrURL: "https://example.com/thank-you",
+        });
+
+        expect(await afterPage.save()).toBeTruthy();
+
+        await afterPage.resetPageToDefault();
+
+        expect(await afterPage.save()).toBeTruthy();
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should display both page type tabs", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await expect(afterPage.pageTypeTab).toHaveCount(2);
+      });
+
+      test("should display the internal page selector", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await afterPage.selectPageTypeTab("internal");
+
+        await expect(afterPage.pageSelector).toBeVisible();
+      });
+
+      test("should display the external URL input", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await afterPage.selectPageTypeTab("external");
+
+        await expect(afterPage.urlInput).toBeVisible();
+      });
+
+      test("should display the Save and Reset to default buttons", async ({
+        dashboardCoursesAfterCheckoutPage: afterPage,
+      }) => {
+        await afterPage.selectPageTypeTab("internal");
+
+        await expect(afterPage.saveBtn).toBeVisible();
+        await expect(afterPage.resetToDefaultBtn).toBeVisible();
       });
     });
   });

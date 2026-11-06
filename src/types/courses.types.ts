@@ -81,3 +81,8 @@ export interface ICourseLandingPage {
   hideEnrollmentCount: boolean;
   customLandingPage: null | string;
 }
+
+export interface ICourseAfterCheckoutPage {
+  type: "internal" | "external";
+  nameOrURL: string;
+}
