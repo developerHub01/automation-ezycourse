@@ -71,9 +71,7 @@ export class DashboardMyCoursesPage {
      * Table filter
      * ======================
      */
-    this.tableFilterArea = this.page
-      .locator("._table_top_itm_all")
-      .first();
+    this.tableFilterArea = this.page.locator("._table_top_itm_all").first();
     this.tableSearchInput = this.tableFilterArea.locator(
       "._top_srch_box1 input",
     );
