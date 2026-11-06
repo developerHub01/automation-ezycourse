@@ -229,7 +229,6 @@ export class DashboardCoursesLandingPagePage extends DashboardCoursesSettingsBas
    * page from the available landing page options.
    */
   selectCustomLandingPage = async (name: string) => {
-    console.log("selectCustomLandingPage ===========");
     if (await this.customLandingPageChooseButton.count())
       await this.customLandingPageChooseButton.click();
     else if (await this.customLandingPageChangeButton.count())
