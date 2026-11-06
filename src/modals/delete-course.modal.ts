@@ -42,19 +42,12 @@ export class DeleteCourseModal extends ModalBase {
 
       if (id) {
         const courseId = await this.courseIdLocator.innerText();
-        console.log({
-          id,
-          courseId,
-        });
         if (id !== Number(courseId)) throw new Error("id not matched");
       }
 
       const deleteComamnd = (
         await this.deleteCommandLocator.innerText()
       ).trim();
-      console.log({
-        deleteComamnd,
-      });
       await this.deleteInput.fill(deleteComamnd);
 
       await this.deleteBtn.click();
