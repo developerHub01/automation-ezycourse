@@ -1034,9 +1034,17 @@ test.describe("Course settings", () => {
 
       test.describe("Presell", () => {
         const options: Array<TCourseAccessibilitySetting["presell"]> = [
-          { enable: true, chargeOption: "immediate" },
-          { enable: true, chargeOption: "later" },
-          { enable: false, chargeOption: "immediate" },
+          {
+            enable: true,
+            chargeOption: "immediate",
+          },
+          {
+            enable: true,
+            chargeOption: "later",
+          },
+          {
+            enable: false,
+          },
         ];
 
         for (const option of options) {
@@ -1047,7 +1055,9 @@ test.describe("Course settings", () => {
           test(`${testName} and save successfully`, async ({
             dashboardCoursesAccessibilitySettingPage: accessibilityPage,
           }) => {
-            await accessibilityPage.changePresellSetting(option);
+            const applied =
+              await accessibilityPage.changePresellSetting(option);
+            test.skip(!applied, "Presell is not available in the current plan");
             expect(await accessibilityPage.save()).toBe(true);
           });
         }
@@ -1067,19 +1077,20 @@ test.describe("Course settings", () => {
         test("should fill partial payload with presell", async ({
           dashboardCoursesAccessibilitySettingPage: accessibilityPage,
         }) => {
-          await accessibilityPage.fill({
+          const applied = await accessibilityPage.fill({
             presell: {
               enable: true,
               chargeOption: "later",
             },
           });
+          test.skip(!applied, "Presell is not available in the current plan");
           expect(await accessibilityPage.save()).toBe(true);
         });
 
         test("should fill complete payload", async ({
           dashboardCoursesAccessibilitySettingPage: accessibilityPage,
         }) => {
-          await accessibilityPage.fill({
+          const applied = await accessibilityPage.fill({
             access: "restricted",
             publish: "published",
             presell: {
@@ -1087,6 +1098,7 @@ test.describe("Course settings", () => {
               chargeOption: "immediate",
             },
           });
+          test.skip(!applied, "Presell is not available in the current plan");
           expect(await accessibilityPage.save()).toBe(true);
         });
       });
@@ -1165,7 +1177,10 @@ test.describe("Course settings", () => {
       }) => {
         await accessibilityPage.presellStatusSwitch.check();
         const options: Array<
-          TCourseAccessibilitySetting["presell"]["chargeOption"]
+          Extract<
+            TCourseAccessibilitySetting["presell"],
+            { enable: true }
+          >["chargeOption"]
         > = ["immediate", "later"];
         for (const option of options) {
           await expect(

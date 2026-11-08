@@ -105,8 +105,12 @@ export type TCourseRedirectToCheckoutPageSetting = string | null;
 export interface TCourseAccessibilitySetting {
   access: TCourseAccessability;
   publish: "published" | "draft";
-  presell: {
-    enable: boolean;
-    chargeOption: "immediate" | "later";
-  };
+  presell:
+    | {
+        enable: true;
+        chargeOption: "immediate" | "later";
+      }
+    | {
+        enable: false;
+      };
 }

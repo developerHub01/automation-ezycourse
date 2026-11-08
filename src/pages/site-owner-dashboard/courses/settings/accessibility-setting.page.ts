@@ -70,20 +70,27 @@ export class DashboardCoursesAccessibilitySettingPage extends DashboardCoursesSe
 
   /*
    * Updates the presell status and charge option.
+   * Returns false when the current plan does not support presell
+   * (charge options disabled), so callers can skip saving.
    */
-  changePresellSetting = async ({
-    enable,
-    chargeOption,
-  }: TCourseAccessibilitySetting["presell"]) => {
-    if (enable) await this.presellStatusSwitch.check();
-    else return await this.presellStatusSwitch.uncheck();
+  changePresellSetting = async (
+    payload: TCourseAccessibilitySetting["presell"],
+  ): Promise<boolean> => {
+    if (!payload.enable) {
+      await this.presellStatusSwitch.uncheck();
+      return true;
+    }
+    await this.presellStatusSwitch.check();
 
-    if (await this.coursePresellOptionLabel.first().isDisabled()) return;
+    if (await this.coursePresellOptionLabel.first().isDisabled()) return false;
 
-    const target = this.coursePresellOptionLabel.getByText(chargeOption);
-    if (!(await target.count())) return;
+    const target = this.coursePresellOptionLabel.getByText(
+      payload.chargeOption,
+    );
+    if (!(await target.count())) return false;
 
     await target.check();
+    return true;
   };
 
   /*
@@ -97,9 +104,12 @@ export class DashboardCoursesAccessibilitySettingPage extends DashboardCoursesSe
   /*
    * Applies the provided accessibility settings.
    */
-  fill = async (payload: Partial<TCourseAccessibilitySetting>) => {
+  fill = async (
+    payload: Partial<TCourseAccessibilitySetting>,
+  ): Promise<boolean> => {
     if (payload.access) await this.changeVisibility(payload.access);
     if (payload.publish) await this.changePublishStatus(payload.publish);
-    if (payload.presell) await this.changePresellSetting(payload.presell);
+    if (payload.presell) return await this.changePresellSetting(payload.presell);
+    return true;
   };
 }

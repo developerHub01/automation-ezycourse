@@ -36,6 +36,7 @@ export class NotificationBase {
   checkStatus = async () => {
     await this.notification.waitFor({
       state: "attached",
+      timeout: 2000,
     });
 
     const ariaLable = (await this.icon.getAttribute(
