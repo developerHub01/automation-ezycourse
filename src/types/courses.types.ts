@@ -101,3 +101,12 @@ export type ICourseCertificationSettings =
     };
 
 export type TCourseRedirectToCheckoutPageSetting = string | null;
+
+export interface TCourseAccessibilitySetting {
+  access: TCourseAccessability;
+  publish: "published" | "draft";
+  presell: {
+    enable: boolean;
+    chargeOption: "immediate" | "later";
+  };
+}
