@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 import { ICourseAdvanceInfo } from "@/types/courses.types";
+import { NotificationBase } from "@/notifications/notification.base";
 import { DashboardCoursesSettingsBase } from "@/pages/site-owner-dashboard/courses/settings/settings.base";
 
 export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBase {
@@ -137,6 +138,8 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
   readonly enableCourseReviewCheck = this.main.locator("#enable_course_review");
   readonly enableGiftingCheck = this.main.locator("#enable_gift");
 
+  readonly notificationBase = new NotificationBase(this.page);
+
   constructor(page: Page) {
     super(page);
   }
@@ -196,6 +199,14 @@ export class DashboardCoursesAdvanceInfoPage extends DashboardCoursesSettingsBas
 
     if (payload.enableGifting !== undefined)
       await this.checkEnableGifting(payload.enableGifting);
+  };
+
+  /**
+   * Save the form and report whether the app confirmed it.
+   */
+  save = async (): Promise<boolean> => {
+    await this.saveBtn.click();
+    return (await this.notificationBase.checkStatus()) === "success";
   };
 
   /**

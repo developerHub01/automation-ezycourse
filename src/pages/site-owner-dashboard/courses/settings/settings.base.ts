@@ -35,6 +35,17 @@ export class DashboardCoursesSettingsBase {
 
   goto = async (courseId: number) => await this.page.goto(this.url(courseId));
 
+  /**
+   * Opens the course settings and waits until the sidebar is ready.
+   */
+  open = async (courseId: number) => {
+    await this.goto(courseId);
+    await this.mainHeading.waitFor({ state: "visible" });
+    await this.sidebarItems.first().waitFor({ state: "visible" });
+  };
+
+  reload = async () => await this.page.reload();
+
   getTabLinkByName = (tab: string) =>
     this.sidebarItems
       .filter({

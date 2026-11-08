@@ -84,8 +84,10 @@ export class DashboardCoursesRedirectToCheckoutPage extends DashboardCoursesSett
       .first()
       .click();
 
-    await this.resetToDefaultBtn.waitFor({
-      state: "attached",
+    /* "Reset to default" only shows up after the page is saved, so just
+     * wait for the dropdown to close here. */
+    await this.pageListBox.waitFor({
+      state: "hidden",
     });
   };
 
@@ -116,7 +118,12 @@ export class DashboardCoursesRedirectToCheckoutPage extends DashboardCoursesSett
     actionButton: Locator,
     pageName: TCourseRedirectToCheckoutPageSetting,
   ) => {
-    if (!pageName || !(await actionButton.isVisible())) return;
+    if (!pageName) return;
+
+    /* isVisible() doesn't wait, and the form renders after the heading, so
+     * wait for the action button (or fail loudly) instead of silently
+     * skipping the configuration. */
+    await actionButton.waitFor({ state: "visible", timeout: 15000 });
 
     await actionButton.click();
 
@@ -126,7 +133,15 @@ export class DashboardCoursesRedirectToCheckoutPage extends DashboardCoursesSett
 
     await this.selectPage(pageName);
 
-    await this.save();
+    const saved = await this.save();
+
+    if (saved) {
+      await this.resetToDefaultBtn.waitFor({
+        state: "visible",
+      });
+    }
+
+    return saved;
   };
 
   /****

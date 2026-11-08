@@ -1,4 +1,5 @@
-import { GalleryModalPage } from "@/pages/modals/gallery-modal.page";
+import { CourseMediaComponent } from "@/components/course-media.component";
+import { CourseTextFieldsComponent } from "@/components/course-text-fields.component";
 import { ISingleCourseBasicInfo } from "@/types/courses.types";
 import { Locator, Page } from "@playwright/test";
 
@@ -7,7 +8,8 @@ export abstract class DashboardCreateCoursesBase {
 
   readonly page: Page;
 
-  readonly gallery: GalleryModalPage;
+  readonly media: CourseMediaComponent;
+  readonly fields: CourseTextFieldsComponent;
 
   /***
    * course creation layout
@@ -39,12 +41,6 @@ export abstract class DashboardCreateCoursesBase {
   readonly subCategoryListBox: Locator;
   readonly subCategoryList: Locator;
 
-  readonly assetWrapper: Locator;
-  readonly imageUploader: Locator;
-  readonly imageInput: Locator;
-  readonly videoUploader: Locator;
-  readonly videoInput: Locator;
-
   readonly previewType: Locator;
   readonly previewLocators: Record<
     NonNullable<ISingleCourseBasicInfo["previewType"]>,
@@ -64,8 +60,6 @@ export abstract class DashboardCreateCoursesBase {
   constructor(page: Page) {
     this.page = page;
 
-    this.gallery = new GalleryModalPage(page);
-
     /***
      * course creation layout
      */
@@ -84,11 +78,10 @@ export abstract class DashboardCreateCoursesBase {
     this.formHeading = this.form.getByRole("heading", {
       level: 2,
     });
-    this.name = this.form.locator("#title");
-    this.shortDescription = this.form.locator("#short_description");
-    this.description = this.form
-      .locator(`._crtSnglCrse_frm1_itm [contenteditable="true"]`)
-      .first();
+    this.fields = new CourseTextFieldsComponent(this.page, this.form);
+    this.name = this.fields.name;
+    this.shortDescription = this.fields.shortDescription;
+    this.description = this.fields.description;
 
     /***
      *  Category
@@ -137,13 +130,10 @@ export abstract class DashboardCreateCoursesBase {
     /**
      *  Assets uploader
      * **/
-    this.assetWrapper = this.form.locator("._crtSnglCrse_frm1_itm:has(#image)");
-
-    this.imageUploader = this.assetWrapper.locator("._1popUp_upld").nth(0);
-    this.videoUploader = this.assetWrapper.locator("._1popUp_upld").nth(1);
-
-    this.imageInput = this.assetWrapper.locator(`#image`).first();
-    this.videoInput = this.assetWrapper.locator(`#video`).first();
+    this.media = new CourseMediaComponent(
+      this.page,
+      this.form.locator("._crtSnglCrse_frm1_itm:has(#image)"),
+    );
 
     this.createBtn = this.form.locator('button[type="submit"]').filter({
       hasText: "Create",
@@ -245,30 +235,19 @@ export abstract class DashboardCreateCoursesBase {
       options: subs,
     });
 
-  setImage = async () => {
-    await this.imageUploader.click();
-    await this.gallery.modal.waitFor({
-      state: "visible",
-    });
-    await this.gallery.selectGalleryTab("Stock Images");
-    await this.gallery.selectNthGalleryItem();
-    await this.gallery.select();
-    await this.gallery.modal.waitFor({
-      state: "detached",
-    });
-  };
+  setImage = async () => await this.media.setImage();
 
-  setVideo = async () => {
-    await this.videoUploader.click();
-    await this.gallery.modal.waitFor({
-      state: "visible",
-    });
-    await this.gallery.selectGalleryTab("Video");
-    await this.gallery.selectNthGalleryItem();
-    await this.gallery.select();
-    await this.gallery.modal.waitFor({
-      state: "detached",
-    });
+  setVideo = async () => await this.media.setVideo();
+
+  /**
+   * Submits the create form and returns the id of the new course, taken
+   * from the edit URL the app redirects to.
+   */
+  create = async (): Promise<number> => {
+    await this.createBtn.click();
+    await this.page.waitForURL(/\/dashboard\/courses\/\d+\//);
+
+    return Number(this.page.url().match(/\/dashboard\/courses\/(\d+)\//)![1]);
   };
 
   back = async () => {

@@ -86,16 +86,16 @@ test.describe("UI testing", () => {
    * This test is for rate limiting, think again before test it
    * ⚠️⚠️⚠️⚠️
    */
-  // test("Test rate limiting", async ({ loginPage }) => {
-  //   for (let i = 0; i < 20; i++) {
-  //     await loginPage.login({
-  //       email: "wrong_email@gmail.com",
-  //       password: "wrong_password",
-  //     });
-  //   }
+  test("Test rate limiting", async ({ loginPage }) => {
+    // for (let i = 0; i < 20; i++) {
+    //   await loginPage.login({
+    //     email: "wrong_email@gmail.com",
+    //     password: "wrong_password",
+    //   });
+    // }
 
-  //   await expect(loginPage.errorToast.first()).toContainText(
-  //     "Too many requests",
-  //   );
-  // });
+    // await expect(loginPage.errorToast.first()).toContainText(
+    //   "Too many requests",
+    // );
+  });
 });

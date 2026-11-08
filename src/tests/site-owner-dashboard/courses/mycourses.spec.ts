@@ -66,7 +66,7 @@ test.describe("All courses", () => {
       dashboardMyCoursesPage: myCoursesPage,
     }) => {
       await myCoursesPage.searchAllOverAndDelete({
-        ids: [48036],
+        ids: [50188, 50194, 50190],
         pageSize: 50,
       });
     });
@@ -91,27 +91,27 @@ test.describe("All courses", () => {
     test("Delete all courses", async ({
       dashboardMyCoursesPage: myCoursesPage,
     }) => {
-      const recursive = async () => {
-        const colIndex = await myCoursesPage.getColIndexByName("id");
-        const allRows = await myCoursesPage.tableRow.all();
+      // const recursive = async () => {
+      //   const colIndex = await myCoursesPage.getColIndexByName("id");
+      //   const allRows = await myCoursesPage.tableRow.all();
 
-        const rowColCount = await allRows[0].getByRole("cell").count();
-        if (rowColCount <= 1) return;
+      //   const rowColCount = await allRows[0].getByRole("cell").count();
+      //   if (rowColCount <= 1) return;
 
-        const ids = await Promise.all(
-          allRows.map(async (row) =>
-            Number(await row.getByRole("cell").nth(colIndex).innerText()),
-          ),
-        );
+      //   const ids = await Promise.all(
+      //     allRows.map(async (row) =>
+      //       Number(await row.getByRole("cell").nth(colIndex).innerText()),
+      //     ),
+      //   );
 
-        await myCoursesPage.searchAllOverAndDelete({
-          ids,
-        });
+      //   await myCoursesPage.searchAllOverAndDelete({
+      //     ids,
+      //   });
 
-        await recursive();
-      };
+      //   await recursive();
+      // };
 
-      await recursive();
+      // await recursive();
     });
   });
 

@@ -114,3 +114,9 @@ export interface TCourseAccessibilitySetting {
         enable: false;
       };
 }
+
+export interface ICourseGradeSettings {
+  enable: boolean;
+  /* Each row grades a score range that ends at `max` */
+  thresholds?: Array<{ max: number; grade: string }>;
+}

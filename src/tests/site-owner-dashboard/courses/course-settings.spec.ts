@@ -1,11 +1,13 @@
 import { expect, test } from "@/fixtures";
+import { DashboardCreateBundleCoursesPage } from "@/pages/site-owner-dashboard/courses/bundle-create.page";
+import { DashboardMyCoursesPage } from "@/pages/site-owner-dashboard/courses/mycourses.page";
 import {
   ICourseLandingPage,
   TCourseAccessability,
   TCourseAccessibilitySetting,
 } from "@/types/courses.types";
 
-const courseId = 50452;
+const courseId = 50435;
 
 const certificateName = "certificate2";
 const redirectToCheckoutPage = "Marketplace";
@@ -1245,6 +1247,204 @@ test.describe("Course settings", () => {
         await expect(redirectPage.chooseCustomPageBtn).toBeVisible();
         await expect(redirectPage.changePageBtn).toBeHidden();
         await expect(redirectPage.resetToDefaultBtn).toBeHidden();
+      });
+    });
+  });
+
+  /****
+   *  Motivation popup
+   */
+  test.describe("Motivation popup", () => {
+    test.beforeEach(
+      async ({ dashboardCoursesMotivationPopupPage: motivationPage }) => {
+        await motivationPage.gotoTab(sidebarItemList[6]);
+        await expect(motivationPage.mainHeading).toHaveText(
+          "Motivation popup setting",
+        );
+      },
+    );
+
+    test.describe("Functional", () => {
+      test("should enable the motivational popup", async ({
+        dashboardCoursesMotivationPopupPage: motivationPage,
+      }) => {
+        await motivationPage.fill({ enable: true });
+        expect(await motivationPage.update()).toBeTruthy();
+
+        await motivationPage.reload();
+        await expect(
+          motivationPage.enableMotivationalPopupCheck,
+        ).toBeChecked();
+      });
+
+      test("should disable the motivational popup", async ({
+        dashboardCoursesMotivationPopupPage: motivationPage,
+      }) => {
+        await motivationPage.fill({ enable: false });
+        expect(await motivationPage.update()).toBeTruthy();
+
+        await motivationPage.reload();
+        await expect(
+          motivationPage.enableMotivationalPopupCheck,
+        ).not.toBeChecked();
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should show the checkbox and the update button", async ({
+        dashboardCoursesMotivationPopupPage: motivationPage,
+      }) => {
+        await expect(
+          motivationPage.enableMotivationalPopupCheck,
+        ).toBeVisible();
+        await expect(motivationPage.updateBtn).toBeVisible();
+      });
+    });
+  });
+
+  /****
+   *  Grade settings
+   */
+  test.describe("Grade settings", () => {
+    test.beforeEach(
+      async ({ dashboardCoursesGradeSettingsPage: gradePage }) => {
+        await gradePage.gotoTab(sidebarItemList[7]);
+        await expect(gradePage.enableGradingCheck).toBeVisible();
+      },
+    );
+
+    test.describe("Functional", () => {
+      test("should enable grading with grade thresholds", async ({
+        dashboardCoursesGradeSettingsPage: gradePage,
+      }) => {
+        await gradePage.fill({
+          enable: true,
+          thresholds: [
+            { max: 49, grade: "F" },
+            { max: 79, grade: "B" },
+            { max: 100, grade: "A" },
+          ],
+        });
+        expect(await gradePage.save()).toBeTruthy();
+
+        await gradePage.reload();
+        await expect(gradePage.enableGradingCheck).toBeChecked();
+        await expect(gradePage.thresholdRows).toHaveCount(3);
+      });
+
+      test("should disable grading", async ({
+        dashboardCoursesGradeSettingsPage: gradePage,
+      }) => {
+        await gradePage.fill({ enable: false });
+        expect(await gradePage.save()).toBeTruthy();
+
+        await gradePage.reload();
+        await expect(gradePage.enableGradingCheck).not.toBeChecked();
+        await expect(gradePage.thresholdTable).toBeHidden();
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should show the thresholds table only while grading is enabled", async ({
+        dashboardCoursesGradeSettingsPage: gradePage,
+      }) => {
+        await gradePage.fill({ enable: true });
+        await expect(gradePage.thresholdTable).toBeVisible();
+
+        await gradePage.fill({ enable: false });
+        await expect(gradePage.thresholdTable).toBeHidden();
+      });
+    });
+  });
+
+  /****
+   *  Progressive mode (bundle courses only)
+   */
+  test.describe("Progressive mode", () => {
+    let bundleId = 0;
+
+    /* Single courses have no progressive mode, so a bundle is created for
+     * these tests and removed afterwards. */
+    test.beforeAll(async ({ browser }) => {
+      const page = await browser.newPage({
+        storageState: "playwright/.auth/site_owner.json",
+      });
+      try {
+        const createPage = new DashboardCreateBundleCoursesPage(page);
+        await createPage.goto();
+        await createPage.formHeading.waitFor({ state: "visible" });
+        await createPage.fill({
+          name: "Progressive mode bundle",
+          shortDescription: "Bundle for progressive mode tests",
+          description: "Bundle for progressive mode tests",
+          category: ["automation1"],
+          previewType: "video",
+          isHideEnrollmentCount: false,
+        });
+        bundleId = await createPage.create();
+      } finally {
+        await page.close();
+      }
+    });
+
+    test.afterAll(async ({ browser }) => {
+      if (!bundleId) return;
+
+      const page = await browser.newPage({
+        storageState: "playwright/.auth/site_owner.json",
+      });
+      try {
+        const myCoursesPage = new DashboardMyCoursesPage(page);
+        await myCoursesPage.goto();
+        await myCoursesPage.delete(bundleId);
+      } finally {
+        await page.close();
+      }
+    });
+
+    test.beforeEach(
+      async ({ dashboardCoursesProgressiveModePage: progressivePage }) => {
+        await progressivePage.goto(bundleId);
+        await expect(progressivePage.mainHeading).toHaveText(
+          "Enable Progressive mode",
+        );
+      },
+    );
+
+    test.describe("Functional", () => {
+      test("should enable progressive mode", async ({
+        dashboardCoursesProgressiveModePage: progressivePage,
+      }) => {
+        await progressivePage.fill({ enable: true });
+        expect(await progressivePage.save()).toBeTruthy();
+
+        await progressivePage.reload();
+        await expect(
+          progressivePage.enableProgressiveModeCheck,
+        ).toBeChecked();
+      });
+
+      test("should disable progressive mode", async ({
+        dashboardCoursesProgressiveModePage: progressivePage,
+      }) => {
+        await progressivePage.fill({ enable: false });
+        expect(await progressivePage.save()).toBeTruthy();
+
+        await progressivePage.reload();
+        await expect(
+          progressivePage.enableProgressiveModeCheck,
+        ).not.toBeChecked();
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should show the checkbox and the save button", async ({
+        dashboardCoursesProgressiveModePage: progressivePage,
+      }) => {
+        await expect(
+          progressivePage.enableProgressiveModeCheck,
+        ).toBeVisible();
+        await expect(progressivePage.saveBtn).toBeVisible();
       });
     });
   });
