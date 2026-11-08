@@ -13,6 +13,7 @@ import { DashboardCoursesLandingPagePage } from "@/pages/site-owner-dashboard/co
 import { DashboardCoursesAfterCheckoutPage } from "@/pages/site-owner-dashboard/courses/settings/after-checkout-page.page";
 import { DashboardCertificateSettingsPage } from "@/pages/site-owner-dashboard/courses/settings/certificate-settings.page";
 import { DashboardCoursesRedirectToCheckoutPage } from "@/pages/site-owner-dashboard/courses/settings/redirect-to-checkout-page.page";
+import { DashboardCoursesAccessibilitySettingPage } from "@/pages/site-owner-dashboard/courses/settings/accessibility-setting.page";
 
 export const test = base.extend<{
   loginPage: LoginPage;
@@ -30,6 +31,7 @@ export const test = base.extend<{
   dashboardCoursesAfterCheckoutPage: DashboardCoursesAfterCheckoutPage;
   dashboardCertificateSettingsPage: DashboardCertificateSettingsPage;
   dashboardCoursesRedirectToCheckoutPage: DashboardCoursesRedirectToCheckoutPage;
+  dashboardCoursesAccessibilitySettingPage: DashboardCoursesAccessibilitySettingPage;
 }>({
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
@@ -68,6 +70,8 @@ export const test = base.extend<{
     await use(new DashboardCertificateSettingsPage(page)),
   dashboardCoursesRedirectToCheckoutPage: async ({ page }, use) =>
     await use(new DashboardCoursesRedirectToCheckoutPage(page)),
+  dashboardCoursesAccessibilitySettingPage: async ({ page }, use) =>
+    await use(new DashboardCoursesAccessibilitySettingPage(page)),
 });
 
 export { expect } from "@playwright/test";

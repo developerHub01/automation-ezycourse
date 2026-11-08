@@ -91,8 +91,7 @@ export class DashboardCoursesAccessibilitySettingPage extends DashboardCoursesSe
    */
   save = async () => {
     await this.saveBtn.click();
-    const status = await this.notificationBase.checkStatus();
-    return status === "success";
+    return (await this.notificationBase.checkStatus()) === "success";
   };
 
   /*

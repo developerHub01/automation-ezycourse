@@ -1,5 +1,9 @@
 import { expect, test } from "@/fixtures";
-import { ICourseLandingPage } from "@/types/courses.types";
+import {
+  ICourseLandingPage,
+  TCourseAccessability,
+  TCourseAccessibilitySetting,
+} from "@/types/courses.types";
 
 const courseId = 50452;
 
@@ -977,6 +981,199 @@ test.describe("Course settings", () => {
       }) => {
         await certificatePage.changeCertificationCheck(false);
         await expect(certificatePage.certificateIdLabel).toBeHidden();
+      });
+    });
+  });
+
+  test.describe("Accessibility Settings", () => {
+    test.beforeEach(
+      async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await accessibilityPage.gotoTab(sidebarItemList[5]);
+        await expect(accessibilityPage.mainHeading).toHaveText(
+          "Course accessibility setting",
+        );
+      },
+    );
+
+    test.describe("Functional", () => {
+      test.describe("Visibility", () => {
+        const options: Array<TCourseAccessability> = [
+          "public",
+          "private",
+          "hidden",
+          "restricted",
+        ];
+
+        for (const option of options) {
+          test(`should change visibility to ${option} and save successfully`, async ({
+            dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+          }) => {
+            await accessibilityPage.changeVisibility(option);
+            expect(await accessibilityPage.save()).toBe(true);
+          });
+        }
+      });
+
+      test.describe("Publish Status", () => {
+        const options: Array<TCourseAccessibilitySetting["publish"]> = [
+          "published",
+          "draft",
+        ];
+
+        for (const option of options) {
+          test(`should change publish status to ${option} and save successfully`, async ({
+            dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+          }) => {
+            await accessibilityPage.changePublishStatus(option);
+            expect(await accessibilityPage.save()).toBe(true);
+          });
+        }
+      });
+
+      test.describe("Presell", () => {
+        const options: Array<TCourseAccessibilitySetting["presell"]> = [
+          { enable: true, chargeOption: "immediate" },
+          { enable: true, chargeOption: "later" },
+          { enable: false, chargeOption: "immediate" },
+        ];
+
+        for (const option of options) {
+          const testName = option.enable
+            ? `should enable presell and set charge option to ${option.chargeOption}`
+            : "should disable presell";
+
+          test(`${testName} and save successfully`, async ({
+            dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+          }) => {
+            await accessibilityPage.changePresellSetting(option);
+            expect(await accessibilityPage.save()).toBe(true);
+          });
+        }
+      });
+
+      test.describe("Fill Method", () => {
+        test("should fill partial payload with access and publish", async ({
+          dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+        }) => {
+          await accessibilityPage.fill({
+            access: "private",
+            publish: "draft",
+          });
+          expect(await accessibilityPage.save()).toBe(true);
+        });
+
+        test("should fill partial payload with presell", async ({
+          dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+        }) => {
+          await accessibilityPage.fill({
+            presell: {
+              enable: true,
+              chargeOption: "later",
+            },
+          });
+          expect(await accessibilityPage.save()).toBe(true);
+        });
+
+        test("should fill complete payload", async ({
+          dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+        }) => {
+          await accessibilityPage.fill({
+            access: "restricted",
+            publish: "published",
+            presell: {
+              enable: true,
+              chargeOption: "immediate",
+            },
+          });
+          expect(await accessibilityPage.save()).toBe(true);
+        });
+      });
+    });
+
+    test.describe("UI", () => {
+      test("should render the accessibility form", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await expect(accessibilityPage.form).toBeVisible();
+      });
+
+      test("should render save button", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await expect(accessibilityPage.saveBtn).toBeVisible();
+        await expect(accessibilityPage.saveBtn).toBeEnabled();
+      });
+
+      test("should render all visibility options", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        const options: Array<TCourseAccessability> = [
+          "public",
+          "private",
+          "hidden",
+          "restricted",
+        ];
+        for (const option of options) {
+          await expect(
+            accessibilityPage.courseVisibilityLabel.getByText(option).first(),
+          ).toBeVisible();
+        }
+      });
+
+      test("should render all publish status options", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        const options: Array<TCourseAccessibilitySetting["publish"]> = [
+          "published",
+          "draft",
+        ];
+        for (const option of options) {
+          await expect(
+            accessibilityPage.courseIsPublishedLabel.getByText(option).first(),
+          ).toBeVisible();
+        }
+      });
+
+      test("should render presell status switch", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await expect(accessibilityPage.presellStatusSwitch).toBeVisible();
+      });
+
+      test("should hide charge options when presell is disabled", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await accessibilityPage.presellStatusSwitch.uncheck();
+        await expect(
+          accessibilityPage.coursePresellOptionLabel.first(),
+        ).not.toBeVisible();
+      });
+
+      test("should enable charge options when presell is enabled", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await accessibilityPage.presellStatusSwitch.check();
+        // await expect(
+        //   accessibilityPage.coursePresellOptionLabel.first(),
+        // ).toBeEnabled();
+      });
+
+      test("should render all charge options when presell is enabled", async ({
+        dashboardCoursesAccessibilitySettingPage: accessibilityPage,
+      }) => {
+        await accessibilityPage.presellStatusSwitch.check();
+        const options: Array<
+          TCourseAccessibilitySetting["presell"]["chargeOption"]
+        > = ["immediate", "later"];
+        for (const option of options) {
+          await expect(
+            accessibilityPage.coursePresellOptionLabel
+              .getByText(option)
+              .first(),
+          ).toBeVisible();
+        }
       });
     });
   });
